@@ -1,0 +1,71 @@
+extends layout
+
+block content
+  header#header.fixed-top
+    .container.d-flex.align-items-center.justify-content-between
+      h1.logo
+        a(href='index.html') OnePage
+      nav#navbar.navbar
+        ul
+          li
+            a.nav-link.scrollto.active(href='#hero') Home
+          li
+            a.nav-link.scrollto(href='#about') About
+          li
+            a.nav-link.scrollto(href='#services') Services
+          li
+            a.nav-link.scrollto.o(href='#portfolio') Portfolio
+          li
+            a.nav-link.scrollto(href='#team') Team
+          li
+            a.nav-link.scrollto(href='#pricing') Pricing
+          li.dropdown
+            a(href='#')
+              span Drop Down
+              i.bi.bi-chevron-down
+            ul
+              li
+                a(href='#') Drop Down 1
+              li.dropdown
+                a(href='#')
+                  span Deep Drop Down
+                  i.bi.bi-chevron-right
+                ul
+                  li
+                    a(href='#') Deep Drop Down 1
+                  li
+                    a(href='#') Deep Drop Down 2
+                  li
+                    a(href='#') Deep Drop Down 3
+                  li
+                    a(href='#') Deep Drop Down 4
+                  li
+                    a(href='#') Deep Drop Down 5
+              li
+                a(href='#') Drop Down 2
+              li
+                a(href='#') Drop Down 3
+              li
+                a(href='#') Drop Down 4
+          li
+            a.nav-link.scrollto(href='#contact') Contact
+          li
+            a.getstarted.scrollto(href='#about') Get Started
+        i.bi.bi-list.mobile-nav-toggle
+      // .navbar
+  table(class="table-sm table-bordered")
+    - var i = 0
+    - var k = 0
+    while (i++ < 7)
+      tr
+        - var j = 0
+        while (j++ < 10)
+          - cnt = j + k
+          td(id="v#{cnt}") 
+        - k = k + j - 1
+
+  h1 test      
+    
+  script get_page1_data();
+
+  // style td,th {font-size:7px}

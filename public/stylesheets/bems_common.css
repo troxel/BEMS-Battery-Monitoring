@@ -1,0 +1,18 @@
+body {
+	  min-height: 1rem;
+     margin-top: 0px;
+     margin-bottom: 0px;
+     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.container { width: 970px !important; }
+
+nav {
+   margin-top: 4px;
+}
+
+.cfs { font-size: 14px;}
+
+.maxmin {  width: 125px;}
+.maxmin td { font-size: 14px; text-align:right;}
+.maxmin caption { font-size: 14px; padding:0px; }

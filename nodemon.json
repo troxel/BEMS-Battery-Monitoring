@@ -1,0 +1,8 @@
+{
+	"events": {
+	  "crash": "kill-port 3001",
+	  "restart": "kill-port 3001"
+	},
+	"delay": "2500",
+	"ignore":["./public","./test"]
+}

@@ -1,0 +1,113 @@
+extends layout
+
+block content
+
+  .container
+    .row  
+      .col String #{str_id} Voltage <span id="vSum"></span> Voltage Ave <span id="vAve"></span>
+      hr
+  .container
+
+    .row.border(style="background-color: #d0d4c0;")
+      .col-2
+        table.maxmin(class="table.sm table-bordered caption-top")
+          caption= "Maximum Voltages"
+          th Tray 
+          th Volts
+
+          - var row = 0
+          while (row < 10)
+            tr
+              td(id="VmaxTray#{row}")
+              td 
+                span(id="VmaxVal#{row}") 
+                span  v
+              - row++
+
+      .col-3
+        table.maxmin(class="table.sm table-bordered caption-top")
+          caption= "Minimum Voltages"
+          th Tray 
+          th Volts
+
+          - var row = 0
+          while (row < 10)
+            tr
+              td(id="VminTray#{row}")
+              td
+                span(id="VminVal#{row}") 
+                span  v
+              - row++
+
+      .col
+        table(class="table-bordered caption-top", style="width:400px")
+          caption Tray Voltages
+          - var start_cell = str_id * 70 + 1 
+          - var k = start_cell 
+          - var rows = start_cell + 7
+          - var cols = 10
+          while (start_cell++ < rows)
+            tr
+              - var j = 0
+              while (j++ < cols)
+                - cnt = j + k - 1
+                td.cfs(id="v#{cnt}") v#{cnt}
+              - k = k + j - 1
+        
+        .form-group(style="margin-top:4px; margin-bottom:3px;")
+          button.btn.btn-primary.btn-sm(type="submit") Set
+          label() Voltage Setpoints High
+          input(class="col-xs-2", id="high", size="2", placeholder="12")
+          label() Low
+          input(class="col-xs-2", id="low", size="2", placeholder="12")
+
+    .row(style="margin-top:10px; background-color: #45E8ED;")
+      .col-2
+        table.maxmin(class="table.sm table-bordered caption-top")
+          caption Maximum Temperatures
+          th Tray 
+          th °F
+
+          - var row = 0
+          while (row < 10)
+            tr
+              td(id="TmaxTray#{row}")
+              td 
+                span(id="TmaxVal#{row}") 
+                span  °F
+              - row++
+      .col-3
+      .col-4
+        table(class="table-bordered caption-top", style="width:400px")
+          caption Tray Temperatures °F
+          - var k = 1
+          - var rows = start_cell + 7
+          - var cols = 10
+          while (start_cell++ < rows)
+            tr
+              - var j = 0
+              while (j < cols)
+                - cnt = j + k
+                - j++
+                td.cfs(id="t#{cnt}") t#{cnt}
+              - k = k + j
+    .row
+      .col
+      .col
+      .col
+        table(class="table-bordered", style="width:400px")
+          - var k = 1
+          - var rows = start_cell + 7
+          - var cols = 10
+          while (start_cell++ < rows)
+            tr
+              - var j = 0
+              while (j < cols)
+                - cnt = j + k
+                - j++
+                td.cfs(id="b#{cnt}") v#{cnt}
+              - k = k + j
+
+
+  script. 
+    ajax_data(#{str_id})
