@@ -6,7 +6,9 @@ const Influx = require('influx');
 
 var influx = new Influx.InfluxDB({
   host: 'localhost',
-  database: 'bems'
+  database: 'bems',
+  username: 'webdev',
+  password: 'bems123'
 })
 
 /* GET home page. */ 

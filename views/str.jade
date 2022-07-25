@@ -10,7 +10,7 @@ block content
 
     .row.border(style="background-color: #d0d4c0;")
       .col-2
-        table.maxmin(class="table.sm table-bordered caption-top")
+        table.maxmin(class="table-bordered caption-top")
           caption= "Maximum Voltages"
           th Tray 
           th Volts
@@ -23,6 +23,10 @@ block content
                 span(id="VmaxVal#{row}") 
                 span  v
               - row++
+        table.maxmin
+          tr
+            td # High Volts
+            td#numHighVolt 
 
       .col-3
         table.maxmin(class="table.sm table-bordered caption-top")
@@ -38,33 +42,38 @@ block content
                 span(id="VminVal#{row}") 
                 span  v
               - row++
+        table.maxmin
+          tr
+            td # Low Volts
+            td#numLowVolt 
 
       .col
         table(class="table-bordered caption-top", style="width:400px")
           caption Tray Voltages
-          - var start_cell = str_id * 70 + 1 
-          - var k = start_cell 
-          - var rows = start_cell + 7
+          - var offset_cell = str_id * 70 + 1 
+          - var rows = 7
           - var cols = 10
-          while (start_cell++ < rows)
+          - var row_cnt = 0
+          while (row_cnt < rows)
             tr
-              - var j = 0
-              while (j++ < cols)
-                - cnt = j + k - 1
-                td.cfs(id="v#{cnt}") v#{cnt}
-              - k = k + j - 1
-        
+              - var col_cnt = 0
+              while (col_cnt < cols)
+                - cell_cnt = offset_cell + col_cnt
+                td.cfs(id="v#{cell_cnt}") v#{cell_cnt}
+                - col_cnt++
+              - offset_cell = offset_cell + cols
+              - row_cnt++
         .form-group(style="margin-top:4px; margin-bottom:3px;")
-          button.btn.btn-primary.btn-sm(type="submit") Set
+          button.spSubmit.btn.btn-primary.btn-sm(type="submit") Set
           label() Voltage Setpoints High
-          input(class="col-xs-2", id="high", size="2", placeholder="12")
+          input#spHighVolt(class="col-xs-2", size="2")
           label() Low
-          input(class="col-xs-2", id="low", size="2", placeholder="12")
+          input#spLowVolt(class="col-xs-2", size="2")
 
-    .row(style="margin-top:10px; background-color: #45E8ED;")
+    .row(style="margin-top:10px; background-color: #d0d4c0;")
       .col-2
         table.maxmin(class="table.sm table-bordered caption-top")
-          caption Maximum Temperatures
+          caption Maximum Temperature
           th Tray 
           th °F
 
@@ -76,21 +85,32 @@ block content
                 span(id="TmaxVal#{row}") 
                 span  °F
               - row++
+        table.maxmin
+          tr
+            td # High Temps
+            td#numHighTemp 
+
       .col-3
       .col-4
         table(class="table-bordered caption-top", style="width:400px")
           caption Tray Temperatures °F
-          - var k = 1
-          - var rows = start_cell + 7
+          - var offset_cell = str_id * 70 + 1 
+          - var rows = 7
           - var cols = 10
-          while (start_cell++ < rows)
+          - var row_cnt = 0
+          while (row_cnt < rows)
             tr
-              - var j = 0
-              while (j < cols)
-                - cnt = j + k
-                - j++
-                td.cfs(id="t#{cnt}") t#{cnt}
-              - k = k + j
+              - var col_cnt = 0
+              while (col_cnt < cols)
+                - cell_cnt = offset_cell + col_cnt
+                td.cfs(id="t#{cell_cnt}") t#{cell_cnt}
+                - col_cnt++
+              - offset_cell = offset_cell + cols
+              - row_cnt++
+        .form-group(style="margin-top:4px; margin-bottom:3px;")
+          button.spSubmit.btn.btn-primary.btn-sm() Set
+          label() Temperature Setpoint High
+          input#spHighTemp.col-xs-2(size="2")
     .row
       .col
       .col
@@ -110,4 +130,5 @@ block content
 
 
   script. 
+    getSetPoints()   // move to layout?
     ajax_data(#{str_id})

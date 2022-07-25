@@ -6,8 +6,8 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-//var strRouter   = require('./routes/str');
-//var xhrRouter   = require('./routes/xhr');
+var strRouter   = require('./routes/str');
+var xhrRouter   = require('./routes/xhr');
 
 var app = express();
 
@@ -34,11 +34,10 @@ app.use(express.static(__dirname + '/node_modules/jquery/dist'));
 // Routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-//app.use('/str', strRouter);
-//app.use('/xhr', xhrRouter);
+app.use('/str', strRouter);
+app.use('/xhr', xhrRouter);
 
 //console.dir(xhrRouter, { depth: null })
-
 
 if (app.get('env') === 'development') {
   app.locals.pretty = true;
