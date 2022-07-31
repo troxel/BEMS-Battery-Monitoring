@@ -202,6 +202,24 @@ $( document ).ready( () => {
       ajax_data(1);
    })
 
+   // Test
+   $("#spHighVolt").change( () => {
+
+      let keys = Object.keys(spHsh);
+      for(let i = 0; i< keys.length;i++) {
+         if ( $("#"+keys[i] )) {
+            let val = $("#"+keys[i] ).val()
+          
+            if ( ! isNaN(val) ) {
+               writeCookie(keys[i],val)
+            }
+         }
+      }
+      ajax_data(1);
+   })
+
+
+   
 })
 
 
