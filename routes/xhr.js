@@ -1,9 +1,13 @@
 var express = require('express');
 var router = express.Router();
 
-var date = new Date();
-const Influx = require('influx');
+const db = require('../services/mysqldb');
+const config = require('../config');
 
+var date = new Date();
+
+// --------- Influx --------------
+const Influx = require('influx');
 var influx = new Influx.InfluxDB({
   host: 'localhost',
   database: 'bems',
@@ -12,10 +16,11 @@ var influx = new Influx.InfluxDB({
 })
 
 /* GET home page. */ 
-router.get('/:str', function(req, res, next) {
+router.get('/:str', async function(req, res, next) {
 
   str_id = req.params.str
   if ( ! ( str_id >= 0 && str_id <= 3 ) ) {
+    console.log(str_id)
     throw new Error('str_id outside range ' + str_id) 
   }
 
@@ -47,13 +52,25 @@ router.get('/:str', function(req, res, next) {
   str_select['eq'][3] = "e211,e212,e213,e214,e215,e216,e217,e218,e219,e220,e221,e222,e223,e224,e225,e226,e227,e228,e229,e230,e231,e232,e233,e234,e235,e236,e237,e238,e239,e240,e241,e242,e243,e244,e245,e246,e247,e248,e249,e250,e251,e252,e253,e254,e255,e256,e257,e258,e259,e260,e261,e262,e263,e264,e265,e266,e267,e268,e269,e270,e271,e272,e273,e274,e275,e276,e277,e278,e279,e280"
   // --------------------------------------------------------
 
-  influx.query([
+  const sql = `select vTS,${str_select['volts'][str_id]} from volts order by vTS desc limit 1;select tTS,${str_select['temperature'][str_id]} from temperature order by tTS desc limit 1;select rTS,${str_select['impedance'][str_id]} from impedance order by rTS desc limit 1`;
+  const rows = await db.querys(sql)
+  
+  //console.log('sql=',sql)
+  //console.log('rows= ',rows)
+  res.json(rows) 
+  
+
+ /*  influx.query([
     `select ${str_select['volts'][str_id]} from volts order by time desc limit 1`,
     `select ${str_select['temperature'][str_id]} from temperature order by time desc limit 1`,
     `select ${str_select['impedance'][str_id]} from impedance order by time desc limit 1`]
   ).then( rows => {
 
-    // Voltage stats
+    res.json(rows) 
+  })
+ */
+
+   /*  // Voltage stats
     Vstat = {} 
     vKeys = Object.keys(rows[0][0])
     vVals = Object.values(rows[0][0])
@@ -125,12 +142,15 @@ router.get('/:str', function(req, res, next) {
     rtn['TmaxTray'] = TmaxTray
     rtn['TmaxVal']  = TmaxVal
     rtn['TStat']    = Tstat
-
+ 
     res.json(rtn) 
-  
   })
+ */ 
   
 });
+
+async function g(sql) {  const rows = await db.querys(sql); return rows }
+
 
 Array.prototype.sum = function() {
   return this.reduce(function(a,b){return a+b;});

@@ -64,7 +64,9 @@ function ajax_data(str_id) {
       // setTimeout(ajax_repeat,50000)
       //},
       error: function (jqXhr, textStatus, errorMessage) { // error callback 
-         alert('Ajax Error: ' + errorMessage); },
+         alert('Ajax Error: ' + errorMessage); 
+         console.log(jqXhr.responseText)
+         },
          timeout:5000,
       dataType: 'json',        
 });

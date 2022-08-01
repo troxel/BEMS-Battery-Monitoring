@@ -20,6 +20,8 @@ influx = new Influx.InfluxDB({
 
   host: 'localhost',
   database: 'bems',
+  username: 'webdev',
+  password: 'bems123',
   schema: [
     {
       measurement: 'volts',
