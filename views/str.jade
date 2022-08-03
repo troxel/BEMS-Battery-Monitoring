@@ -4,7 +4,7 @@ block content
 
   .container
     .row  
-      .col String #{str_id} Voltage <span id="vSum"></span> Voltage Ave <span id="vAve"></span>
+      .col-xs String #{str_id} Voltage <span id="vSum"></span> Voltage Ave <span id="vAve"></span>
       hr
   .container
 
@@ -27,9 +27,10 @@ block content
           tr
             td # High Volts
             td#numHighVolt 
+            td trays
 
       .col-3
-        table.maxmin(class="table.sm table-bordered caption-top")
+        table.maxmin.table-bordered.caption-top()
           caption= "Minimum Voltages"
           th Tray 
           th Volts
@@ -46,9 +47,10 @@ block content
           tr
             td # Low Volts
             td#numLowVolt 
+            td trays
 
-      .col
-        table(class="table-bordered caption-top", style="width:400px")
+      .col-7
+        table(class="table-bordered caption-top traytbl", style="width:400px")
           caption Tray Voltages
           - var offset_cell = str_id * 70 + 1 
           - var rows = 7
@@ -59,20 +61,20 @@ block content
               - var col_cnt = 0
               while (col_cnt < cols)
                 - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="v#{cell_cnt}") v#{cell_cnt}
+                td.cfs(id="v#{cell_cnt}", title="v#{cell_cnt}") v#{cell_cnt}
                 - col_cnt++
               - offset_cell = offset_cell + cols
               - row_cnt++
         .form-group(style="margin-top:4px; margin-bottom:3px;")
           button.spSubmit.btn.btn-primary.btn-sm(type="submit") Set
           label() Voltage Setpoints High
-          input#spHighVolt(class="col-xs-2", size="2")
+          input#spHighVolt.spVal(size="2")
           label() Low
-          input#spLowVolt(class="col-xs-2", size="2")
+          input#spLowVolt.spVal(size="2")
 
     .row(style="margin-top:10px; background-color: #d0d4c0;")
-      .col-2
-        table.maxmin(class="table.sm table-bordered caption-top")
+      .col-3
+        table.maxmin.table-bordered.caption-top()
           caption Maximum Temperature
           th Tray 
           th °F
@@ -89,8 +91,9 @@ block content
           tr
             td # High Temps
             td#numHighTemp 
+            td trays
 
-      .col-3
+      .col-2
       .col-4
         table(class="table-bordered caption-top", style="width:400px")
           caption Tray Temperatures °F

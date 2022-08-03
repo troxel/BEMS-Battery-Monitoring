@@ -3,16 +3,20 @@ body {
      margin-top: 0px;
      margin-bottom: 0px;
      font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
+     width: 970px !important;
+ }
 
-.container { width: 970px !important; }
+.container { 
+   width: 970px !important; 
+}
 
 nav {
    margin-top: 4px;
 }
 
-.cfs { font-size: 14px;}
+.cfs { font-size: 14px;padding:3px;}
+.traytbl { }
 
-.maxmin {  width: 150px;}
-.maxmin td { font-size: 14px; text-align:right;}
+.maxmin {  width: 157px;}
+.maxmin td { font-size: 14px; text-align:right; padding-right:7px;}
 .maxmin caption { font-size: 14px; padding:0px; }

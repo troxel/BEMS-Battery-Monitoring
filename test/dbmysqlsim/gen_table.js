@@ -8,7 +8,7 @@ for(j of pLst) {
 		tLst.push(`${j}${i} float`)
 	}
 	
-	var str = `CREATE TABLE ${pHsh[j]} ( ${j}TS timestamp not null default current_timestamp primary key,`
+	var str = `CREATE TABLE ${pHsh[j]} ( time timestamp not null default current_timestamp primary key,`
 	str += tLst.join(',')
 	str += ");"
 

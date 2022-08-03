@@ -60,14 +60,15 @@ function ajax_data(str_id) {
          if ( numEl != null ) numEl.innerHTML = numHighTemp
 
       },
-      //complete: function(){
-      // setTimeout(ajax_repeat,50000)
-      //},
-      error: function (jqXhr, textStatus, errorMessage) { // error callback 
+      complete: function(){
+         //alert('starting timeout')
+         setTimeout(ajax_data,5000,str_id)
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
          alert('Ajax Error: ' + errorMessage); 
          console.log(jqXhr.responseText)
-         },
-         timeout:5000,
+      },
+      timeout:20000,
       dataType: 'json',        
 });
 }

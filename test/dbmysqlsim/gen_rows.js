@@ -48,10 +48,10 @@ function insert_rows(){
 		valStr = tLst.join(',')
 
 		var sql = `INSERT INTO ${pHsh[j]} VALUES (NULL,${valStr})`;
-		console.log(sql)
+		//console.log(sql)
 		con.query(sql, function (err, result) {
 		  if (err) throw err;
-		  console.log("1 record inserted");
+		  console.log(`1 record inserted`);
 		});
 	
 	}	
