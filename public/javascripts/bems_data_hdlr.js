@@ -1,79 +1,96 @@
-function ajax_data(str_id) {
+function ajax_data() {
 
-  let host = window.location.hostname
-  let proto = window.location.protocol
-  let port = window.location.port
-  var url = `${proto}//${host}:${port}/xhr/${str_id}`;
- 
-   $.ajax({
-      url: url,
-      success: function(data){ 
+   let str_id = Number(document.getElementById("str_id").value)
+   let str_lbl = str_id + 1
+  
+   if ( ! ( str_id >= 0 && str_id <= 3 ) ) {
+         console.error('str_id outside range 0 to 3 = ',str_id)
+         alert('str_lbl outside range 1 to 4 = ' + str_lbl)
+         // Maybe a redirect here...
+         return
+   }
+   
+   let host = window.location.hostname
+   let proto = window.location.protocol
+   let port = window.location.port
+   let url = `${proto}//${host}:${port}/xhr/str/${str_lbl}`;
 
-         for (let series in data) {
-            for (let key in data[series]) {
-               let td = document.getElementById(key)
-               if ( td != null ) {
-                  td.innerHTML = data[series][key]
+   var xhr = $.ajax({
+         url: url,
+         success: function(data){ 
+
+            if ( data['error'] ) {
+               this.error(this.xhr,this.textStatus,data['error'])
+               return
+            }
+
+            // --- Process Data ----
+            for (let series in data) {
+               for (let key in data[series]) {
+                  let td = document.getElementById(key)
+                  if ( td != null ) {
+                     td.innerHTML = data[series][key]
+                  }
                }
             }
-         }
 
-         // highlights
-         let spHighVolt = document.getElementById("spHighVolt").value
-         let spLowVolt = document.getElementById("spLowVolt").value
-         let numHighVolt = 0
-         let numLowVolt  = 0
-         for ( let key in data['volts']){
-            let td = document.getElementById(key)
-            if ( td != null ){
-               td.style.backgroundColor  = "green"
-               if (data['volts'][key] >= spHighVolt){
-                  td.style.backgroundColor  = "red"
-                  numHighVolt++
-               }else if ( data['volts'][key] <= spLowVolt ){
-                  td.style.backgroundColor  = "yellow"
-                  numLowVolt++
+            // highlights
+            let spHighVolt = document.getElementById("spHighVolt").value
+            let spLowVolt = document.getElementById("spLowVolt").value
+            let numHighVolt = 0
+            let numLowVolt  = 0
+            for ( let key in data['volts']){
+               let td = document.getElementById(key)
+               if ( td != null ){
+                  td.style.backgroundColor  = "forestgreen"
+                  if (data['volts'][key] >= spHighVolt){
+                     td.style.backgroundColor  = "#EE2222"
+                     numHighVolt++
+                  }else if ( data['volts'][key] <= spLowVolt ){
+                     td.style.backgroundColor  = "#DDDD11"
+                     numLowVolt++
+                  } 
                } 
-            } 
-         }
+            }
 
-         let numEl = document.getElementById('numHighVolt')
-         if ( numEl != null ) numEl.innerHTML = numHighVolt
-         
-         numEl = document.getElementById('numLowVolt')
-         if ( numEl != null ) numEl.innerHTML = numLowVolt
+            let numEl = document.getElementById('numHighVolt')
+            if ( numEl != null ) numEl.innerHTML = numHighVolt
+            
+            numEl = document.getElementById('numLowVolt')
+            if ( numEl != null ) numEl.innerHTML = numLowVolt
 
-         let numHighTemp = 0
-         let spHighTemp = document.getElementById("spHighTemp").value
-         for ( let key in data['temperature']){
-            let td = document.getElementById(key)
-            if ( td != null ){
-               td.style.backgroundColor  = "green"
-               if (data['temperature'][key] >= spHighTemp){
-                  td.style.backgroundColor  = "red"
-                  numHighTemp++
+            let numHighTemp = 0
+            let spHighTemp = document.getElementById("spHighTemp").value
+            for ( let key in data['temperature']){
+               let td = document.getElementById(key)
+               if ( td != null ){
+                  td.style.backgroundColor  = "forestgreen"
+                  if (data['temperature'][key] >= spHighTemp){
+                     td.style.backgroundColor  = "#EE2222"
+                     numHighTemp++
+                  } 
                } 
-            } 
-         }
-         
-         numEl = document.getElementById('numHighTemp')
-         if ( numEl != null ) numEl.innerHTML = numHighTemp
+            }
+            
+            numEl = document.getElementById('numHighTemp')
+            if ( numEl != null ) numEl.innerHTML = numHighTemp
 
-      },
-      complete: function(){
-         //alert('starting timeout')
-         setTimeout(ajax_data,5000,str_id)
-      },
-      error: function (jqXhr, textStatus, errorMessage) {
-         alert('Ajax Error: ' + errorMessage); 
-         console.log(jqXhr.responseText)
-      },
-      timeout:20000,
-      dataType: 'json',        
-});
+         },
+         complete: function(){
+            setTimeout(ajax_data,5000)
+         },
+         error: function (jqXhr, textStatus, errorMessage) {
+            alert('Ajax Error! ' + errorMessage);
+         },
+         timeout:30000,
+         dataType: 'json',        
+   });
 }
 
-function get_str_data(str_id) {
+function get_home_data() {
+
+}
+/* function get_str_data() {
 
    //$.get("http://perlworks.com:8086/query?pretty=true&db=bems&q=SELECT+*+FROM+volts+limit+1").done(
    //function (data) { var d = data["results"][0]["series"][0]["values"][0][1]; alert(d); 
@@ -152,7 +169,7 @@ function ajax_max(){
            timeout:500000,
            dataType: 'json',        
    });
-};
+}; */
 
 // Global used by getSetPoints() and setSetPoints()
 // Defaults
@@ -171,7 +188,7 @@ function getSetPoints() {
 
       let val = readCookie(keys[i])
      
-      if ( ! (isNaN(val)) ) {
+      if ( (! isNaN(val)) && (val>1) ) {
          spHsh[keys[i]] = val
       }
  
@@ -190,7 +207,8 @@ function getSetPoints() {
 // ------------------------------------
 $( document ).ready( () => {
   
-   $(".spSubmit").click( () => {
+   // Set Point Change
+   $(".spVal").change( () => {
 
       let keys = Object.keys(spHsh);
       for(let i = 0; i< keys.length;i++) {
@@ -202,31 +220,14 @@ $( document ).ready( () => {
             }
          }
       }
-      ajax_data(1);
+
+      ajax_data();
    })
 
-   // Test
-   $("#spHighVolt").change( () => {
-
-      let keys = Object.keys(spHsh);
-      for(let i = 0; i< keys.length;i++) {
-         if ( $("#"+keys[i] )) {
-            let val = $("#"+keys[i] ).val()
-          
-            if ( ! isNaN(val) ) {
-               writeCookie(keys[i],val)
-            }
-         }
-      }
-      ajax_data(1);
-   })
+}) // Form Handler 
 
 
-   
-})
-
-
-// Util
+// ---------- Cookie Utils ------------------------
 function writeCookie(name, value, days) {
 
        var expires = "";

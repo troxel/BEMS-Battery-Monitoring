@@ -15,13 +15,14 @@ var influx = new Influx.InfluxDB({
   password: 'bems123'
 })
 
-/* GET home page. */ 
-router.get('/:str', async function(req, res, next) {
+/* GET str page. */ 
+router.get('/str/:str', async function(req, res, next) {
 
-  str_id = req.params.str
+  // Never should happen but... 
+  let str_id = req.params.str - 1
   if ( ! ( str_id >= 0 && str_id <= 3 ) ) {
-    console.log(str_id)
-    throw new Error('str_id outside range ' + str_id) 
+    console.error(str_id)
+    res.json({error: `str_id ${str_id} is outside acceptible range`}) 
   }
 
   // ---- Hard code for efficiency
@@ -146,10 +147,85 @@ router.get('/:str', async function(req, res, next) {
     res.json(rtn) 
 })
   
+router.get('/home', async function(req, res, next) {
 
-async function g(sql) {  const rows = await db.querys(sql); return rows }
+  const sql = `select * from volts order by time desc limit 1;select * from temperature order by time desc limit 1;select * from impedance order by time desc limit 1`;
+  const rows = await db.querys(sql)
+  
+  // Voltage stats
+  Vstat = {} 
+  vKeys = Object.keys(rows[0][0])
+  vVals = Object.values(rows[0][0])
+  vHash = rows[0][0]
+  vKeys.shift()
+  vVals.shift()
+    
+  Vstat['vSum'] = vVals.sum().toFixed(0)
+  Vstat['vAve'] = (Vstat['vSum']/vVals.length).toFixed(1)
+        
+    vKeys.sort((a,b)=>{return vHash[a]-vHash[b]})
 
+    // Max and min Voltage data
+    let VminTray = {}
+    let VminVal = {}
+    let VmaxTray = {}
+    let VmaxVal = {}
+    const reTray = /(\d+)$/
+    
+    for (let i = 0;i<10;i++){
 
+      let tray = reTray.exec(vKeys[i])[0]
+
+      VminTray["VminTray" + i] = tray
+      VminVal["VminVal" + i] = vHash[vKeys[i]]
+
+      let offset = (vKeys.length-10) - i; 
+      tray = reTray.exec(vKeys[offset])[0]
+
+      VmaxTray["VmaxTray" + i] = tray
+      VmaxVal["VmaxVal" + i] = vHash[vKeys[offset]]
+    }
+
+    // Temperature stats
+    Tstat = {} 
+    tKeys = Object.keys(rows[1][0])
+    tVals = Object.values(rows[1][0])
+    tHash = rows[1][0]
+    tKeys.shift()
+    tVals.shift()
+
+    Tstat['tAve'] = (tVals.sum()/tVals.length).toFixed(1)
+        
+    // Descending sort
+    tKeys.sort((a,b)=>{return tHash[b]-tHash[a]})
+
+    // Max Temperature data
+    let TmaxTray = {}
+    let TmaxVal = {}
+    
+    for (let i = 0;i<10;i++){
+
+      let tray = reTray.exec(tKeys[i])[0]
+
+      TmaxTray["TmaxTray" + i] = tray
+      TmaxVal["TmaxVal" + i] = tHash[tKeys[i]]
+    }
+    
+    // Prepare to return
+    let rtn = {}
+    rtn['VminTray'] = VminTray
+    rtn['VminVal']  = VminVal
+    rtn['VmaxTray'] = VmaxTray
+    rtn['VmaxVal']  = VmaxVal
+    rtn['VStat']    = Vstat
+    rtn['TmaxTray'] = TmaxTray
+    rtn['TmaxVal']  = TmaxVal
+    rtn['TStat']    = Tstat
+ 
+    res.json(rtn) 
+})
+
+// handy dandy array sum function
 Array.prototype.sum = function() {
   return this.reduce(function(a,b){return a+b;});
 };

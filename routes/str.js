@@ -8,7 +8,11 @@ var numTrays = 270
 /* GET home page. */ 
 router.get('/:str', function(req, res, next) {
 
-  res.render('str', { str_id:req.params.str-1 });
+  let strHsh = {}
+  strHsh['str_lbl'] = req.params.str
+  strHsh['str_id']  = req.params.str - 1
+  console.log("str ",strHsh)
+  res.render('str', strHsh);
 
 });
 

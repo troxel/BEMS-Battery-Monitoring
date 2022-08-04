@@ -2,9 +2,10 @@ extends layout
 
 block content
 
+  input#str_id(type="hidden",value="#{str_id}")
   .container
     .row  
-      .col-xs String #{str_id} Voltage <span id="vSum"></span> Voltage Ave <span id="vAve"></span>
+      .col-xs String <span id="str_lbl">#{str_lbl}</span> Voltage <span id="vSum"></span> Voltage Ave <span id="vAve"></span>
       hr
   .container
 
@@ -25,9 +26,9 @@ block content
               - row++
         table.maxmin
           tr
-            td # High Volts
+            td High Voltage Trays
             td#numHighVolt 
-            td trays
+            td 
 
       .col-3
         table.maxmin.table-bordered.caption-top()
@@ -45,9 +46,9 @@ block content
               - row++
         table.maxmin
           tr
-            td # Low Volts
+            td Low Voltage Trays
             td#numLowVolt 
-            td trays
+            td
 
       .col-7
         table(class="table-bordered caption-top traytbl", style="width:400px")
@@ -61,12 +62,12 @@ block content
               - var col_cnt = 0
               while (col_cnt < cols)
                 - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="v#{cell_cnt}", title="v#{cell_cnt}") v#{cell_cnt}
+                td.cfs(id="v#{cell_cnt}", title="v#{cell_cnt}") &nbsp;
                 - col_cnt++
               - offset_cell = offset_cell + cols
               - row_cnt++
         .form-group(style="margin-top:4px; margin-bottom:3px;")
-          button.spSubmit.btn.btn-primary.btn-sm(type="submit") Set
+          //- button.spSubmit.btn.btn-primary.btn-sm(type="submit") Set
           label() Voltage Setpoints High
           input#spHighVolt.spVal(size="2")
           label() Low
@@ -89,9 +90,9 @@ block content
               - row++
         table.maxmin
           tr
-            td # High Temps
+            td High Temp Trays
             td#numHighTemp 
-            td trays
+            td
 
       .col-2
       .col-4
@@ -106,14 +107,14 @@ block content
               - var col_cnt = 0
               while (col_cnt < cols)
                 - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="t#{cell_cnt}") t#{cell_cnt}
+                td.cfs(id="t#{cell_cnt}") &nbsp;
                 - col_cnt++
               - offset_cell = offset_cell + cols
               - row_cnt++
         .form-group(style="margin-top:4px; margin-bottom:3px;")
-          button.spSubmit.btn.btn-primary.btn-sm() Set
+          //- button.spSubmit.btn.btn-primary.btn-sm() Set
           label() Temperature Setpoint High
-          input#spHighTemp.col-xs-2(size="2")
+          input#spHighTemp.spVal(size="2")
     .row
       .col
       .col
@@ -131,7 +132,8 @@ block content
                 td.cfs(id="b#{cnt}") v#{cnt}
               - k = k + j
 
-
-  script. 
-    getSetPoints()   // move to layout?
-    ajax_data(#{str_id})
+  script.
+    $( document ).ready( () => {
+      getSetPoints()   
+      ajax_data()
+    })
