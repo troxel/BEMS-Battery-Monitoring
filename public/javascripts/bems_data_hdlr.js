@@ -1,4 +1,9 @@
-function ajax_data() {
+var host = window.location.hostname
+var proto = window.location.protocol
+var port = window.location.port
+var url_srv = `${proto}//${host}:${port}`;
+
+function get_str_data() {
 
    let str_id = Number(document.getElementById("str_id").value)
    let str_lbl = str_id + 1
@@ -9,12 +14,9 @@ function ajax_data() {
          // Maybe a redirect here...
          return
    }
-   
-   let host = window.location.hostname
-   let proto = window.location.protocol
-   let port = window.location.port
-   let url = `${proto}//${host}:${port}/xhr/str/${str_lbl}`;
 
+   var url = `${url_srv}/xhr/str/${str_lbl}`;
+   
    var xhr = $.ajax({
          url: url,
          success: function(data){ 
@@ -24,17 +26,11 @@ function ajax_data() {
                return
             }
 
-            // --- Process Data ----
-            for (let series in data) {
-               for (let key in data[series]) {
-                  let td = document.getElementById(key)
-                  if ( td != null ) {
-                     td.innerHTML = data[series][key]
-                  }
-               }
-            }
-
+            // --- Dispaly Data ----
+            displayById(data)
+            
             // highlights
+            // processHiLo(data['volts],hiThreshold,lowThreshold)
             let spHighVolt = document.getElementById("spHighVolt").value
             let spLowVolt = document.getElementById("spLowVolt").value
             let numHighVolt = 0
@@ -77,17 +73,45 @@ function ajax_data() {
 
          },
          complete: function(){
-            setTimeout(ajax_data,5000)
+            setTimeout(get_str_data,5000)
          },
          error: function (jqXhr, textStatus, errorMessage) {
-            alert('Ajax Error! ' + errorMessage);
+            console.error('Ajax Error! ' + errorMessage);
          },
          timeout:30000,
          dataType: 'json',        
    });
 }
 
+// ------------------------- Home --------------------------
 function get_home_data() {
+   var url = `${url_srv}/xhr/home`;
+
+   var xhr = $.ajax({
+         url: url,
+         success: function(data){ 
+
+            if ( data['error'] ) {
+               this.error(this.xhr,this.textStatus,data['error'])
+               return
+            }
+
+            // --- display by id ----
+            displayById(data)
+
+            // -- alarms and faults ---
+            displayAlmFlt(data['flt_alm'])
+         },
+         complete: function(){
+            setTimeout(get_home_data,5000)
+         },
+         error: function (jqXhr, textStatus, errorMessage) {
+            console.error('Ajax Error! ' + errorMessage);
+         },
+         timeout:30000,
+         dataType: 'json',        
+   });
+
 
 }
 /* function get_str_data() {
@@ -194,11 +218,57 @@ function getSetPoints() {
  
       // generic for all pages
       let spEl = document.getElementById(keys[i])
-
       if ( spEl != null ) {
          spEl.value = spHsh[keys[i]]
       }
    }
+}
+
+// ------------------------------
+// Displays data on document where key 
+// matches element Id
+// Ignores if element doesn't exist
+// Data format is: data[series][ids]
+// ------------------------------
+function displayById(data)
+{
+
+   for (let series in data) {
+      for (let key in data[series]) {
+         let elid = document.getElementById(key)
+         if ( elid != null ) {
+            elid.innerHTML = data[series][key]
+         }
+      }
+   }
+}
+
+// ------------------------------
+// Displays data on document where key 
+// ------------------------------
+function displayAlmFlt(flt_alm_lst) {
+   sortToggle = readCookie('sortToggle')
+
+   let flt_alm_str = ''
+   let tbl = document.getElementById("flt_alm")
+   tbl.innerHTML = "";
+
+   
+   for (let i = 0; i < flt_alm_lst.length; i++){
+      let row = tbl.insertRow(i)
+      let cell0 = row.insertCell(0)
+      let cell1 = row.insertCell(1)
+      cell0.innerHTML = flt_alm_lst[i]['ts']
+      cell1.innerHTML = flt_alm_lst[i]['msg']
+      if ( flt_alm_lst[i].flt_sw ) {
+         row.classList.add("bg-danger");
+      }
+      else {
+         row.classList.add("bg-warning");
+      }
+   } 
+
+ 
 }
 
 

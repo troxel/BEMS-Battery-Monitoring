@@ -18,5 +18,7 @@ nav {
 .traytbl { }
 
 .maxmin {  width: 157px;}
-.maxmin td { font-size: 14px; text-align:right; padding-right:7px;}
+.maxmin td { font-size: 12px; text-align:right; padding-right:7px; height:13x;}
 .maxmin caption { font-size: 14px; padding:0px; }
+
+.spVal {height:21px; ;}

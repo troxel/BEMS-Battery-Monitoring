@@ -6,6 +6,9 @@ const config = require('../config');
 
 var date = new Date();
 
+// Fault and alarm to ID relation
+var flt_alm_msg = { 1:'Voltage High!',2:'Voltage Sorta High!',3:'Smoke Detected!',4:'Fire Detected!',5:'Current over threshold' }
+
 // --------- Influx --------------
 const Influx = require('influx');
 var influx = new Influx.InfluxDB({
@@ -149,80 +152,102 @@ router.get('/str/:str', async function(req, res, next) {
   
 router.get('/home', async function(req, res, next) {
 
-  const sql = `select * from volts order by time desc limit 1;select * from temperature order by time desc limit 1;select * from impedance order by time desc limit 1`;
-  const rows = await db.querys(sql)
+  let sql = `select * from volts order by time desc limit 1;select * from temperature order by time desc limit 1;select * from impedance order by time desc limit 1`;
+  let rows = await db.querys(sql)
   
   // Voltage stats
-  Vstat = {} 
-  vKeys = Object.keys(rows[0][0])
-  vVals = Object.values(rows[0][0])
-  vHash = rows[0][0]
+  let Vstat = {} 
+  let vKeys = Object.keys(rows[0][0])
+  let vVals = Object.values(rows[0][0])
+  let vHash = rows[0][0]
+
+  // Remove time
   vKeys.shift()
   vVals.shift()
-    
-  Vstat['vSum'] = vVals.sum().toFixed(0)
-  Vstat['vAve'] = (Vstat['vSum']/vVals.length).toFixed(1)
+  
+  let vTmp = [...vVals];
+  for (let i=0;i<4;i++){
+    Vstat['vSumStr'+i] = (vTmp.splice(0,69).sum().toFixed(0))
+  }
+  //Vstat['vSum'] = vVals.sum().toFixed(0)
+  //Vstat['vAve'] = (Vstat['vSum']/vVals.length).toFixed(1)
         
-    vKeys.sort((a,b)=>{return vHash[a]-vHash[b]})
+  vKeys.sort((a,b)=>{return vHash[a]-vHash[b]})
 
-    // Max and min Voltage data
-    let VminTray = {}
-    let VminVal = {}
-    let VmaxTray = {}
-    let VmaxVal = {}
-    const reTray = /(\d+)$/
-    
-    for (let i = 0;i<10;i++){
+  // Max and min Voltage data
+  let VminTray = {}
+  let VminVal = {}
+  let VmaxTray = {}
+  let VmaxVal = {}
+  const reTray = /(\d+)$/
+  
+  for (let i = 0;i<10;i++){
 
-      let tray = reTray.exec(vKeys[i])[0]
+    let tray = reTray.exec(vKeys[i])[0]
 
-      VminTray["VminTray" + i] = tray
-      VminVal["VminVal" + i] = vHash[vKeys[i]]
+    VminTray["VminTray" + i] = tray
+    VminVal["VminVal" + i] = vHash[vKeys[i]]
 
-      let offset = (vKeys.length-10) - i; 
-      tray = reTray.exec(vKeys[offset])[0]
+    let offset = (vKeys.length-10) - i; 
+    tray = reTray.exec(vKeys[offset])[0]
 
-      VmaxTray["VmaxTray" + i] = tray
-      VmaxVal["VmaxVal" + i] = vHash[vKeys[offset]]
-    }
+    VmaxTray["VmaxTray" + i] = tray
+    VmaxVal["VmaxVal" + i] = vHash[vKeys[offset]]
+  }
 
-    // Temperature stats
-    Tstat = {} 
-    tKeys = Object.keys(rows[1][0])
-    tVals = Object.values(rows[1][0])
-    tHash = rows[1][0]
-    tKeys.shift()
-    tVals.shift()
+  // Temperature stats
+  Tstat = {} 
+  tKeys = Object.keys(rows[1][0])
+  tVals = Object.values(rows[1][0])
+  tHash = rows[1][0]
+  tKeys.shift()
+  tVals.shift()
 
-    Tstat['tAve'] = (tVals.sum()/tVals.length).toFixed(1)
-        
-    // Descending sort
-    tKeys.sort((a,b)=>{return tHash[b]-tHash[a]})
+  Tstat['tAve'] = (tVals.sum()/tVals.length).toFixed(1)
+      
+  // Descending sort
+  tKeys.sort((a,b)=>{return tHash[b]-tHash[a]})
 
-    // Max Temperature data
-    let TmaxTray = {}
-    let TmaxVal = {}
-    
-    for (let i = 0;i<10;i++){
+  // Max Temperature data
+  let TmaxTray = {}
+  let TmaxVal = {}
+  
+  for (let i = 0;i<10;i++){
 
-      let tray = reTray.exec(tKeys[i])[0]
+    // extract the number from the column name
+    let tray = reTray.exec(tKeys[i])[0]
 
-      TmaxTray["TmaxTray" + i] = tray
-      TmaxVal["TmaxVal" + i] = tHash[tKeys[i]]
-    }
-    
-    // Prepare to return
-    let rtn = {}
-    rtn['VminTray'] = VminTray
-    rtn['VminVal']  = VminVal
-    rtn['VmaxTray'] = VmaxTray
-    rtn['VmaxVal']  = VmaxVal
-    rtn['VStat']    = Vstat
-    rtn['TmaxTray'] = TmaxTray
-    rtn['TmaxVal']  = TmaxVal
-    rtn['TStat']    = Tstat
- 
-    res.json(rtn) 
+    TmaxTray["TmaxTray" + i] = tray
+    TmaxVal["TmaxVal" + i] = tHash[tKeys[i]]
+  }
+  
+  // Faults and Alarms ....
+  sql = `select  time,incident_id,flt_sw from flt_alm_buffer;select incident_id,incident_str from flt_alm_msg`;
+  rows = await db.querys(sql)
+
+  let flt_alm_lst = []
+  for(let i = 0; i<rows[0].length; i++){
+    let time = rows[0][i]['time']
+    let id = rows[0][i]['incident_id']
+    let sw = rows[0][i]['flt_sw']
+    timefmt = (new Date(time)).toLocaleString('en-GB', { timeZone: 'America/Los_Angeles',hour12: false })
+    flt_alm_lst.push({ts:timefmt, msg:flt_alm_msg[id],flt_sw:sw})
+  }  
+  
+  // Prepare to return
+  let rtn = {}
+  rtn['flt_alm'] = flt_alm_lst
+  rtn['VminTray'] = VminTray
+  rtn['VminVal']  = VminVal
+  rtn['VmaxTray'] = VmaxTray
+  rtn['VmaxVal']  = VmaxVal
+  rtn['VStat']    = Vstat
+  //rtn['Vsum']     = Vsum
+  rtn['TmaxTray'] = TmaxTray
+  rtn['TmaxVal']  = TmaxVal
+  rtn['TStat']    = Tstat
+
+  res.json(rtn) 
 })
 
 // handy dandy array sum function

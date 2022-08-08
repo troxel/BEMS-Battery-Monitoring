@@ -1,8 +1,104 @@
 extends layout
 
 block content
-  h1 test      
-    
-  script get_home_data();
+  .container
+    section.row
+      .col
+        table.table(width="100%")
+          tr
+            th
+            th Str 1
+            th Str 2
+            th Str 3
+            th Str 4
+            th Aux
+          tr
+            th Voltage     
+            td#vSumStr0 
+            td#vSumStr1 
+            td#vSumStr2 
+            td#vSumStr3 
+            td#vSumAux
+          tr
+            th Current      
+            td#iSumStr0 
+            td#iSumStr1 
+            td#iSumStr2 
+            td#iSumStr3 
+            td#iSumAux  
+    section.row
+      .col-3 
+        table.maxmin.table-bordered.caption-top()
+          caption= "Low Voltages"
+          th Tray 
+          th Volts
+          - var row = 0
+          while (row < 10)
+            tr
+              td(id="VminTray#{row}")
+              td
+                span(id="VminVal#{row}") 
+                span  v
+              - row++
+
+        table.maxmin.table-bordered.caption-top()
+          caption Maximum Temperature
+          th Tray 
+          th °F
+
+          - var row = 0
+          while (row < 10)
+            tr
+              td(id="TmaxTray#{row}")
+              td 
+                span(id="TmaxVal#{row}") 
+                span  °F
+              - row++
+
+      .col
+        table.table-bordered
+          thead
+            tr
+              th Time
+              th Msg 
+          tbody#flt_alm
+          
+
+    section.row
+      .col
+        table
+          tr
+            th(style="font-strength:bold; font-size:1.2em") Setpoints
+            th High 
+            th Low 
+          tr
+            th Voltage
+            td 
+              input#spHighVolt.spVal(size="2")
+            td 
+              input#spLowVolt.spVal(size="2")
+          tr
+            th Impedance
+            td 
+              input#spHighTempsVolt.spVal(size="2")
+            td 
+          tr
+            th Temperature
+            td 
+              input#spHighTempsVolt.spVal(size="2")
+            td 
+          tr
+            th Current
+            td 
+              input#spHighCurr.spVal(size="2")
+            td 
+
+
+  script 
+    $( document ).ready( () => {
+      getSetPoints()   
+
+      get_home_data();
+    })
 
   // style td,th {font-size:7px}
