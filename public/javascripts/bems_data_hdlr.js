@@ -1,8 +1,10 @@
-var host = window.location.hostname
-var proto = window.location.protocol
-var port = window.location.port
+const host = window.location.hostname
+const proto = window.location.protocol
+const port = window.location.port
 var url_srv = `${proto}//${host}:${port}`;
+var timeoutId
 
+// ------------------------- String --------------------------
 function get_str_data() {
 
    let str_id = Number(document.getElementById("str_id").value)
@@ -15,7 +17,7 @@ function get_str_data() {
          return
    }
 
-   var url = `${url_srv}/xhr/str/${str_lbl}`;
+   const url = `${url_srv}/xhr/str/${str_lbl}`;
    
    var xhr = $.ajax({
          url: url,
@@ -84,8 +86,12 @@ function get_str_data() {
 }
 
 // ------------------------- Home --------------------------
-function get_home_data() {
+function get_home_data(clearFaults=0) {
+   
    var url = `${url_srv}/xhr/home`;
+   if (clearFaults) {
+      url += '?clearFaults=1'
+   }
 
    var xhr = $.ajax({
          url: url,
@@ -103,7 +109,8 @@ function get_home_data() {
             displayAlmFlt(data['flt_alm'])
          },
          complete: function(){
-            setTimeout(get_home_data,5000)
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(get_home_data,5000)
          },
          error: function (jqXhr, textStatus, errorMessage) {
             console.error('Ajax Error! ' + errorMessage);
@@ -111,9 +118,46 @@ function get_home_data() {
          timeout:30000,
          dataType: 'json',        
    });
-
-
 }
+
+// ------------------------- System --------------------------
+function get_sys_data(action) {
+
+   var url = `${url_srv}/sys/xhr`;
+
+   console.log(action)
+   if ( typeof action != 'undefined') {
+      if ( 'id' in action) {
+         url += `?id=${action.id}&cmd=${action.cmd}`
+      }
+   }
+
+   var xhr = $.ajax({
+         url: url,
+         success: function(data){ 
+            if ( data['error'] ) {
+               this.error(this.xhr,this.textStatus,data['error'])
+               return
+            }
+         
+            // --- display by id ----
+            displayById(data)
+            classListById(data)
+         },
+         complete: function(){
+            // clear previous so don't stack'm up
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(get_sys_data,9000)
+         },
+         error: function (jqXhr, textStatus, errorMessage) {
+            console.error('Ajax Error! ' + errorMessage);
+         },
+         timeout:30000,
+         dataType: 'json',        
+   });
+}
+
+
 /* function get_str_data() {
 
    //$.get("http://perlworks.com:8086/query?pretty=true&db=bems&q=SELECT+*+FROM+volts+limit+1").done(
@@ -234,6 +278,9 @@ function displayById(data)
 {
 
    for (let series in data) {
+
+      if ( series === 'classList') continue
+
       for (let key in data[series]) {
          let elid = document.getElementById(key)
          if ( elid != null ) {
@@ -244,15 +291,49 @@ function displayById(data)
 }
 
 // ------------------------------
+// data[classList] = {elid:{add:myclass,remove:thatclass},... }
+// ------------------------------
+function classListById(data) {
+   for (let key in data['classList']) {
+      let elid = document.getElementById(key)
+
+      if ( elid != null ) {
+         for (let method in data['classList'][key]){
+            elid.classList[method](data['classList'][key][method])
+         }
+      }
+   }
+}
+// ------------------------------
 // Displays data on document where key 
 // ------------------------------
 function displayAlmFlt(flt_alm_lst) {
    sortToggle = readCookie('sortToggle')
 
+   // wipe it clean
    let flt_alm_str = ''
    let tbl = document.getElementById("flt_alm")
-   tbl.innerHTML = "";
+   if (tbl == null) return
 
+   tbl.innerHTML = "";
+   
+   if ( flt_alm_lst.length == 0 ) {
+     
+      let row = tbl.insertRow(0)
+      if (row != null ) {
+         row.classList.add("bg-success");
+         row.classList.add("text-white");
+      }
+
+      let cell0 = row.insertCell(0)
+      if (cell0 != null ) {
+         cell0.setAttribute('colspan','99')
+         cell0.style.textAlign = 'center'
+         cell0.innerHTML = "No Alarms or Faults"
+      }
+ 
+      return
+   }
    
    for (let i = 0; i < flt_alm_lst.length; i++){
       let row = tbl.insertRow(i)
@@ -273,7 +354,7 @@ function displayAlmFlt(flt_alm_lst) {
 
 
 // ------------------------------------
-// --- Form Handlers ------------------
+// --- Event Handlers ------------------
 // ------------------------------------
 $( document ).ready( () => {
   
@@ -293,6 +374,21 @@ $( document ).ready( () => {
 
       ajax_data();
    })
+
+   $("#clearFaults").click( () => { 
+      get_home_data(1)
+   })
+
+   // ------------- system
+   $(".procSubmit").click( (event) => {
+      
+      get_sys_data({id:event.target.id,cmd:event.target.innerHTML})
+
+   })
+
+
+
+
 
 }) // Form Handler 
 

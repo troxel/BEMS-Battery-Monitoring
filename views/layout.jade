@@ -18,7 +18,7 @@ html
 
 
   body
-    nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.mb-4
+    nav.navbar.navbar-expand.navbar-dark.bg-dark.mb-4
       .container
         a.navbar-brand(href='/') BEMS
         ul.navbar-nav.me-auto.mb-2.mb-lg-0
@@ -30,5 +30,25 @@ html
             a.nav-link(href="/str/3") String 3
           li.nav-item
             a.nav-link(href="/str/4") String 4
-
+          li.nav-item.dropdown
+            a.nav-link.dropdown-toggle(data-bs-toggle="dropdown", href="#", role="button", aria-expanded="false") Charge
+            ul.dropdown-menu
+              li.dropdown-item.bg-dark
+                a#chg1.nav-link(href="/chg/1") Charge 1
+              li.dropdown-item.bg-dark
+                a#chg2.nav-link(href="/chg/2") Charge 2
+              li.dropdown-item.bg-dark
+                a#chg3.nav-link(href="/chg/3") Charge 3
+              li.dropdown-item.bg-dark
+                a#chg4.nav-link(href="/chg/4") Charge 4
+              li.dropdown-item.bg-dark
+                a#chg5.nav-link(href="/chg/5") Charge 5
+              li.dropdown-item.bg-dark
+                a#chg6.nav-link(href="/chg/6") Charge 6
+              li.dropdown-item.bg-dark
+                a#chg7.nav-link(href="/chg/7") Charge 7
+          li.nav-item
+            a#sys.nav-link(href="/sys") System  
+          li.nav-item
+            a#sim.nav-link(href="/sim") Sim  
     block content

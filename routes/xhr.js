@@ -10,14 +10,16 @@ var date = new Date();
 var flt_alm_msg = { 1:'Voltage High!',2:'Voltage Sorta High!',3:'Smoke Detected!',4:'Fire Detected!',5:'Current over threshold' }
 
 // --------- Influx --------------
-const Influx = require('influx');
+/* const Influx = require('influx');
 var influx = new Influx.InfluxDB({
   host: 'localhost',
   database: 'bems',
   username: 'webdev',
   password: 'bems123'
 })
+ */
 
+// -----------------------------------------------------------
 /* GET str page. */ 
 router.get('/str/:str', async function(req, res, next) {
 
@@ -150,6 +152,7 @@ router.get('/str/:str', async function(req, res, next) {
     res.json(rtn) 
 })
   
+// -----------------------------------------------------------
 router.get('/home', async function(req, res, next) {
 
   let sql = `select * from volts order by time desc limit 1;select * from temperature order by time desc limit 1;select * from impedance order by time desc limit 1`;
@@ -222,6 +225,13 @@ router.get('/home', async function(req, res, next) {
   }
   
   // Faults and Alarms ....
+  if ( req.query.clearFaults ){
+    sql = 'delete from flt_alm_buffer'
+    let result = await db.querys(sql)
+    console.log(result)
+  
+  }
+  
   sql = `select  time,incident_id,flt_sw from flt_alm_buffer;select incident_id,incident_str from flt_alm_msg`;
   rows = await db.querys(sql)
 
@@ -249,6 +259,95 @@ router.get('/home', async function(req, res, next) {
 
   res.json(rtn) 
 })
+
+// -----------------------------------------------------------
+//  GET System Data 
+// -----------------------------------------------------------
+const execSync = require('child_process').execSync;
+
+var cmdObj = {}
+cmdObj['bems_main']  = {lbl:'Bems Main',cmd:'bems_main.exe'}
+cmdObj['bems_gui']   = {lbl:'Bems Gui',cmd:'/bin/node /opt/bems/bin/www'}
+cmdObj['bems_aux']  = {lbl:'Bems Aux',cmd:'bems_aux.exe'}
+cmdObj['bems_env']  = {lbl:'Bems Env',cmd:'bems_env.exe'}
+cmdObj['sbs_dcm']  = {lbl:'Bems SBS',cmd:'sbs_dcm.py'}
+
+router.get('/sys', async function(req, res, next) {
+
+  if ( req.query.id ) {
+   console.log(req.query.id,req.query.cmd)
+  }
+
+  var procObj = {}
+  for (const key in cmdObj) {
+    procObj[key + '_pid'] = '--'
+    procObj[key + '_cpu'] = '--'
+    procObj[key + '_mem'] = '--'
+    procObj[key + '_btn'] = 'START'
+  }
+
+  var classObj = {}
+  
+  try {
+    var stdout = execSync("journalctl --unit=bems_gui -n 50 --no-pager",{timeout:2000,encoding:'utf8'})
+    let err_lst = stdout.split("\n")
+    var stdoutBr = err_lst.join("<br>")
+
+    
+    stdout = execSync("ps aux",{timeout:2000,encoding:'utf8'})
+    let lst = []
+    lst = stdout.split(/\n+/)
+
+    let lstLst = []
+    for(let i=0;i<lst.length;i++) {
+        lstLst[i] = []
+        lstLst[i] = lst[i].split(/\s+/)
+
+        // The last col is the command and can contain spaces
+        if (lstLst[i].length > 11){
+            let cmd = []
+            cmd = lstLst[i].slice(10)
+            let cmdStr = cmd.join(" ")
+            lstLst[i][10] = cmdStr
+            
+            for (key in cmdObj) {
+
+                if ( procObj.hasOwnProperty(key + '_fnd') ) {
+                  continue; 
+                }  
+                // might need a regexp instead
+                if ( cmdObj[key]['cmd'] === cmdStr ) {
+            
+                  procObj[key + '_pid'] = lstLst[i][1]
+                  procObj[key + '_cpu'] = lstLst[i][2]
+                  procObj[key + '_mem'] = lstLst[i][3]
+                  procObj[key + '_btn'] = 'RESTART'
+
+                  procObj[key + '_fnd'] = true // used to continue above as we found our process
+
+                  classObj[key] = {add:'text-succes'}
+                }
+               
+            } // end for
+        }
+    }
+  }
+    catch(error) {
+      console.log("Error in xhr sys ",error);
+  }
+
+
+  // Prepare to return
+  let rtn = {}
+  rtn['proc'] = procObj
+  rtn['log'] = {logTail:stdoutBr}
+ 
+
+  res.json(rtn) 
+
+})
+
+
 
 // handy dandy array sum function
 Array.prototype.sum = function() {

@@ -47,3 +47,7 @@ console.log("#-----------------------------------")
 var str = 'CREATE TABLE flt_alm_msg ( incident_id int UNSIGNED PRIMARY KEY, incident_str varchar(30));'
 console.log(str)
 console.log("#-----------------------------------")
+
+var str = `CREATE TABLE string_current ( time timestamp not null default current_timestamp primary key,str1 float,str2 float,str3 float,str4 float,`
+str += tLst.join(',')
+str += ");"

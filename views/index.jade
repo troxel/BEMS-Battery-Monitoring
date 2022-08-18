@@ -56,12 +56,19 @@ block content
               - row++
 
       .col
-        table.table-bordered
+        table.table-bordered.w-100
           thead
-            tr
+            tr(style="text-align:center")
               th Time
               th Msg 
           tbody#flt_alm
+
+          table.w-100
+            thead
+              tr(style="text-align:right;")
+                td() 
+                  button#clearFaults.btn.btn-outline-primary.text-small(type="button",style="height:30px;margin-top:7px;") Clear
+
           
 
     section.row
