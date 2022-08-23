@@ -153,11 +153,23 @@ router.get('/str/:str', async function(req, res, next) {
 })
   
 // -----------------------------------------------------------
+// HOME
+// -----------------------------------------------------------
 router.get('/home', async function(req, res, next) {
 
+  // Get last insert
   let sql = `select * from volts order by time desc limit 1;select * from temperature order by time desc limit 1;select * from impedance order by time desc limit 1`;
-  let rows = await db.querys(sql)
   
+  var rows
+  try {
+    rows = await db.querys(sql)
+  } catch(err) {
+    console.error("Error xhr: ",err)
+  } 
+
+  // Return object
+  rtnObj = {}
+
   // Voltage stats
   let Vstat = {} 
   let vKeys = Object.keys(rows[0][0])
@@ -168,34 +180,31 @@ router.get('/home', async function(req, res, next) {
   vKeys.shift()
   vVals.shift()
   
-  let vTmp = [...vVals];
+  console.log('length =',vVals.length)
+
+  // Calculate string series voltage
   for (let i=0;i<4;i++){
-    Vstat['vSumStr'+i] = (vTmp.splice(0,69).sum().toFixed(0))
+    rtnObj['vSumStr'+i] = (vVals.splice(0,69).sum().toFixed(0))
   }
-  //Vstat['vSum'] = vVals.sum().toFixed(0)
-  //Vstat['vAve'] = (Vstat['vSum']/vVals.length).toFixed(1)
         
+  // Sort tray id by voltage
   vKeys.sort((a,b)=>{return vHash[a]-vHash[b]})
 
-  // Max and min Voltage data
-  let VminTray = {}
-  let VminVal = {}
-  let VmaxTray = {}
-  let VmaxVal = {}
+  // Used to extract just the tray number ie v101 > 101
   const reTray = /(\d+)$/
   
   for (let i = 0;i<10;i++){
 
     let tray = reTray.exec(vKeys[i])[0]
 
-    VminTray["VminTray" + i] = tray
-    VminVal["VminVal" + i] = vHash[vKeys[i]]
+    rtnObj["VminTray" + i] = tray
+    rtnObj["VminVal" + i] = vHash[vKeys[i]]
 
     let offset = (vKeys.length-10) - i; 
     tray = reTray.exec(vKeys[offset])[0]
 
-    VmaxTray["VmaxTray" + i] = tray
-    VmaxVal["VmaxVal" + i] = vHash[vKeys[offset]]
+    rtnObj["VmaxTray" + i] = tray
+    rtnObj["VmaxVal" + i] = vHash[vKeys[offset]]
   }
 
   // Temperature stats
@@ -206,9 +215,9 @@ router.get('/home', async function(req, res, next) {
   tKeys.shift()
   tVals.shift()
 
-  Tstat['tAve'] = (tVals.sum()/tVals.length).toFixed(1)
+  rtnObj['tAve'] = (tVals.sum()/tVals.length).toFixed(1)
       
-  // Descending sort
+  // Descending sort of trays per values
   tKeys.sort((a,b)=>{return tHash[b]-tHash[a]})
 
   // Max Temperature data
@@ -220,8 +229,8 @@ router.get('/home', async function(req, res, next) {
     // extract the number from the column name
     let tray = reTray.exec(tKeys[i])[0]
 
-    TmaxTray["TmaxTray" + i] = tray
-    TmaxVal["TmaxVal" + i] = tHash[tKeys[i]]
+    rtnObj["TmaxTray" + i] = tray
+    rtnObj["TmaxVal" + i] = tHash[tKeys[i]]
   }
   
   // Faults and Alarms ....
@@ -246,17 +255,9 @@ router.get('/home', async function(req, res, next) {
   
   // Prepare to return
   let rtn = {}
+  rtn['innerHtml'] = rtnObj
   rtn['flt_alm'] = flt_alm_lst
-  rtn['VminTray'] = VminTray
-  rtn['VminVal']  = VminVal
-  rtn['VmaxTray'] = VmaxTray
-  rtn['VmaxVal']  = VmaxVal
-  rtn['VStat']    = Vstat
-  //rtn['Vsum']     = Vsum
-  rtn['TmaxTray'] = TmaxTray
-  rtn['TmaxVal']  = TmaxVal
-  rtn['TStat']    = Tstat
-
+ 
   res.json(rtn) 
 })
 
@@ -267,7 +268,7 @@ const execSync = require('child_process').execSync;
 
 var cmdObj = {}
 cmdObj['bems_main']  = {lbl:'Bems Main',cmd:'bems_main.exe'}
-cmdObj['bems_gui']   = {lbl:'Bems Gui',cmd:'/bin/node /opt/bems/bin/www'}
+cmdObj['bems_gui']   = {lbl:'Bems Gui',cmd:'/bin/node /opt/bems_gui/bems/bin/www'}
 cmdObj['bems_aux']  = {lbl:'Bems Aux',cmd:'bems_aux.exe'}
 cmdObj['bems_env']  = {lbl:'Bems Env',cmd:'bems_env.exe'}
 cmdObj['sbs_dcm']  = {lbl:'Bems SBS',cmd:'sbs_dcm.py'}

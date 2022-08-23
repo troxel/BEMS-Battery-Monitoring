@@ -4,6 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+var setHdr = require('./middleware/setHdr.js');
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var strRouter   = require('./routes/str');
@@ -34,6 +36,9 @@ app.use(express.static(__dirname + '/node_modules/jquery/dist'));
   next();
 } )
  */
+
+// Set the header for all pages
+app.use(setHdr)
 
 // Routes
 app.use('/', indexRouter);

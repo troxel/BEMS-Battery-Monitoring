@@ -13,7 +13,7 @@ cmdObj['/opt/bems_aux/bin/bems_env']   = {lbl:'Bems Env',id:'bems_env'}
 
 var cmdObj = {}
 cmdObj['bems_main']  = {lbl:'Bems Main',cmd:'bems_main.exe'}
-cmdObj['bems_gui']   = {lbl:'Bems Gui',cmd:'/bin/node /opt/bems/bin/www'}
+cmdObj['bems_gui']   = {lbl:'Bems Gui',cmd:'/bin/node /opt/bems/bems_gui/bin/www'}
 cmdObj['bems_aux']  = {lbl:'Bems Aux',cmd:'bems_aux.exe'}
 cmdObj['bems_env']  = {lbl:'Bems Env',cmd:'bems_env.exe'}
 cmdObj['sbs_dcm']  = {lbl:'Bems SBS',cmd:'sbs_dcm.py'}
@@ -109,12 +109,17 @@ router.get('/xhr', async function(req, res, next) {
       console.log("Error in xhr sys ",error);
   }
 
+  procObj.spn = req.spn
+ 
+  console.log(req.tStamp)
 
   // Prepare to return
   let rtn = {}
+  rtn['hdr'] = {ts:req.ts}
   rtn['proc'] = procObj
   rtn['log'] = {logBr:logBr,topBr:topBr,dfBr:dfBr}
   rtn['classList'] = classObj
+
 
   res.json(rtn) 
 

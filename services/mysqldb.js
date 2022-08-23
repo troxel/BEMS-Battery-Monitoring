@@ -3,9 +3,16 @@ const config = require('../config');
 
 async function querys(sql, params) {
   const connection = await mysql.createConnection(config.db)
-  const [results, ] = await connection.query(sql, params)
-  connection.end()
-  return results;
+  try {
+    const [results, ] = await connection.query(sql, params)
+    connection.end()
+    return results;
+  } catch(err) {
+    console.log('DB Error :', err.sql)
+    console.log('DB Error :', err.sqlMessage)
+    connection.end()
+    return false
+  }
 }
 
 module.exports = {
