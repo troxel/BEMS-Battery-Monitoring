@@ -18,7 +18,9 @@ cmdObj['bems_aux']  = {lbl:'Bems Aux',cmd:'bems_aux.exe'}
 cmdObj['bems_env']  = {lbl:'Bems Env',cmd:'bems_env.exe'}
 cmdObj['sbs_dcm']  = {lbl:'Bems SBS',cmd:'sbs_dcm.py'}
 
-/* GET home page. */ 
+// -----------------------------------------------------------
+//  GET System Data Paint Page
+// -----------------------------------------------------------
 router.get('/', function(req, res, next) {
 
     res.render('sys',{cmdObj:cmdObj})
@@ -38,34 +40,36 @@ cmdObj['sbs_dcm']  = {lbl:'Bems SBS',cmd:'sbs_dcm.py'}
  */
 router.get('/xhr', async function(req, res, next) {
 
+  let rtnObj = {}
+  rtnObj['innerHTML'] = {}
+  rtnObj['classList'] = {}
+
   if ( req.query.id ) {
    console.log(req.query.id,req.query.cmd)
   }
 
-  var procObj = {}
-  var classObj = {}
   for (const key in cmdObj) {
-    procObj[key + '_pid'] = '--'
-    procObj[key + '_cpu'] = '--'
-    procObj[key + '_mem'] = '--'
-    procObj[key + '_btn'] = 'START',
-    classObj[key] = {add:'text-danger'}
+    rtnObj['innerHTML'][key + '_pid'] = '--'
+    rtnObj['innerHTML'][key + '_cpu'] = '--'
+    rtnObj['innerHTML'][key + '_mem'] = '--'
+    rtnObj['innerHTML'][key + '_btn'] = 'START',
+    rtnObj['classList'][key] = {add:'text-danger'}
   }
 
   
   try {
     var stdout = execSync("journalctl --unit=bems_gui -n 10 -r --no-pager",{timeout:2000,encoding:'utf8'})
     let logLst = stdout.split("\n")
-    var logBr = logLst.join("<br>")
+    rtnObj['innerHTML']['logBr'] = logLst.join("<br>")
 
     // -b batch mode necessary
     stdout = execSync("top -n 1 -b",{timeout:2000,encoding:'utf8'})
     let topLst = stdout.split("\n").slice(0,5)
-    var topBr = topLst.join("<br>")
+    rtnObj['innerHTML']['topBr'] = topLst.join("<br>")
 
     stdout = execSync("df -h",{timeout:2000,encoding:'utf8'})
     let dfLst = stdout.split("\n")
-    var dfBr = dfLst.join("<br>")
+    rtnObj['innerHTML']['dfBr'] = dfLst.join("<br>")
     
     stdout = execSync("ps aux",{timeout:2000,encoding:'utf8'})
     let lst = []
@@ -85,20 +89,20 @@ router.get('/xhr', async function(req, res, next) {
             
             for (key in cmdObj) {
 
-                if ( procObj.hasOwnProperty(key + '_fnd') ) {
+                if ( rtnObj['innerHTML'].hasOwnProperty(key + '_fnd') ) {
                   continue; 
                 }  
                 // might need a regexp instead
                 if ( cmdObj[key]['cmd'] === cmdStr ) {
             
-                  procObj[key + '_pid'] = lstLst[i][1]
-                  procObj[key + '_cpu'] = lstLst[i][2]
-                  procObj[key + '_mem'] = lstLst[i][3]
-                  procObj[key + '_btn'] = 'RESTART'
+                  rtnObj['innerHTML'][key + '_pid'] = lstLst[i][1]
+                  rtnObj['innerHTML'][key + '_cpu'] = lstLst[i][2]
+                  rtnObj['innerHTML'][key + '_mem'] = lstLst[i][3]
+                  rtnObj['innerHTML'][key + '_btn'] = 'RESTART'
 
-                  procObj[key + '_fnd'] = true // used to continue above as we found our process
+                  rtnObj['innerHTML'][key + '_fnd'] = true // used to continue above as we found our process
 
-                  classObj[key] = {add:'text-success'}
+                  rtnObj['classList'][key] = {add:'text-success'}
                 }
                
             } // end for
@@ -109,19 +113,10 @@ router.get('/xhr', async function(req, res, next) {
       console.log("Error in xhr sys ",error);
   }
 
-  procObj.spn = req.spn
- 
-  console.log(req.tStamp)
+  rtnObj['innerHTML']['spn'] = req.spn   // still used?
+  rtnObj['innerHTML']['ts'] = req.ts
 
-  // Prepare to return
-  let rtn = {}
-  rtn['hdr'] = {ts:req.ts}
-  rtn['proc'] = procObj
-  rtn['log'] = {logBr:logBr,topBr:topBr,dfBr:dfBr}
-  rtn['classList'] = classObj
-
-
-  res.json(rtn) 
+  res.json(rtnObj) 
 
 })
 

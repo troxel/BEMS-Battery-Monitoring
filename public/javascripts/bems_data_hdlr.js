@@ -29,7 +29,8 @@ function get_str_data() {
             }
 
             // --- Dispaly Data ----
-            displayById(data)
+            dh = dataHdlr()
+            dh.process(data)
             
             // highlights
             // processHiLo(data['volts],hiThreshold,lowThreshold)
@@ -102,15 +103,13 @@ function get_home_data(clearFaults=0) {
                return
             }
 
-            // --- display by id ----
-            displayById(data)
-
-            // -- alarms and faults ---
-            displayAlmFlt(data['flt_alm'])
+            dh = dataHdlr({fltAlm:fltAlm})
+            dh.process(data)
+            
          },
          complete: function(){
             clearTimeout(timeoutId)
-            timeoutId = setTimeout(get_home_data,5000)
+            timeoutId = setTimeout(get_home_data,25000)
          },
          error: function (jqXhr, textStatus, errorMessage) {
             console.error('Ajax Error! ' + errorMessage);
@@ -120,12 +119,13 @@ function get_home_data(clearFaults=0) {
    });
 }
 
+// ----------------------------------------------------------
 // ------------------------- System --------------------------
+// ----------------------------------------------------------
 function get_sys_data(action) {
 
    var url = `${url_srv}/sys/xhr`;
 
-   console.log(action)
    if ( typeof action != 'undefined') {
       if ( 'id' in action) {
          url += `?id=${action.id}&cmd=${action.cmd}`
@@ -141,8 +141,11 @@ function get_sys_data(action) {
             }
          
             // --- display by id ----
-            displayById(data)
-            classListById(data)
+
+console.log(data)
+
+            let dh = dataHdlr()
+            dh.process(data)
          },
          complete: function(){
             // clear previous so don't stack'm up
@@ -268,7 +271,8 @@ function getSetPoints() {
    }
 }
 
-// ------------------------------
+
+/* // ------------------------------
 // Displays data on document where key 
 // matches element Id
 // Ignores if element doesn't exist
@@ -280,6 +284,7 @@ function displayById(data)
    for (let series in data) {
 
       if ( series === 'classList') continue
+      if ( series === 'exempt') continue
 
       for (let key in data[series]) {
          let elid = document.getElementById(key)
@@ -294,6 +299,7 @@ function displayById(data)
 // data[classList] = {elid:{add:myclass,remove:thatclass},... }
 // ------------------------------
 function classListById(data) {
+
    for (let key in data['classList']) {
       let elid = document.getElementById(key)
 
@@ -350,6 +356,106 @@ function displayAlmFlt(flt_alm_lst) {
    } 
 
  
+} */
+
+// ------------------------------------
+// --- Data Handler ------------------
+// ------------------------------------
+function dataHdlr(hdlrObj) {
+
+   // Add non-standard handlers
+   for (let k in hdlrObj) {
+      this[k] = hdlrObj[k]
+   }
+
+   //---------------------------------   
+   this.innerHTML = function(data)
+   {
+      for (let key in data) {
+         let elid = document.getElementById(key)
+         if ( elid != null ) {
+            elid.innerHTML = data[key]
+         }
+      }
+   }
+
+   // ------------------------------
+   // data[classList] = {elid:{add:myclass,remove:thatclass},... }
+   // ------------------------------
+   this.classList = function(data) {
+
+      for (let key in data) {
+         const elid = document.getElementById(key)
+
+         if ( elid != null ) {
+            for (let method in data[key]){
+               elid.classList[method](data[key][method])
+            }
+         }
+      }
+   }
+
+   this.src = function() {}
+
+ 
+   // --- The crux --- 
+   // Routes data to the handler of the same name
+   this.process = function(dataIn) {
+      for (key in dataIn) {
+         if ( typeof this[key] == 'function') {
+            // Call the function with the data
+            this[key](dataIn[key])
+         }
+      }  
+   }
+
+   return(this)
+}
+
+// ------------------------------
+//  flt_alm_lst = [ {ts:timestamp,msg:fltalmMsg},... ]
+// ------------------------------
+function fltAlm(flt_alm_lst) {
+   sortToggle = readCookie('sortToggle')
+
+   // wipe it clean
+   let flt_alm_str = ''
+   let tbl = document.getElementById("flt_alm")
+   if (tbl == null) return
+
+   tbl.innerHTML = "";
+   
+   if ( flt_alm_lst.length == 0 ) {
+     
+      let row = tbl.insertRow(0)
+      if (row != null ) {
+         row.classList.add("bg-success");
+         row.classList.add("text-white");
+      }
+
+      let cell0 = row.insertCell(0)
+      if (cell0 != null ) {
+         cell0.setAttribute('colspan','99')
+         cell0.style.textAlign = 'center'
+         cell0.innerHTML = "No Alarms or Faults"
+      }
+ 
+      return
+   }
+   
+   for (let i = 0; i < flt_alm_lst.length; i++){
+      let row = tbl.insertRow(i)
+      let cell0 = row.insertCell(0)
+      let cell1 = row.insertCell(1)
+      cell0.innerHTML = flt_alm_lst[i]['ts']
+      cell1.innerHTML = flt_alm_lst[i]['msg']
+      if ( flt_alm_lst[i].flt_sw ) {
+         row.classList.add("bg-danger");
+      }
+      else {
+         row.classList.add("bg-warning");
+      }
+   }
 }
 
 

@@ -60,7 +60,12 @@ router.get('/str/:str', async function(req, res, next) {
 
   const sql = `select time,${str_select['volts'][str_id]} from volts order by time desc limit 1;select time,${str_select['temperature'][str_id]} from temperature order by time desc limit 1;select time,${str_select['impedance'][str_id]} from impedance order by time desc limit 1`;
   const rows = await db.querys(sql)
-  
+
+    // Prepare to return
+  let innerHTML = rows[0][0]              // Volts
+  innerHTML = {...innerHTML, ...rows[1][0] }  // Temperature
+  innerHTML = {...innerHTML, ...rows[2][0] }  // Impedance
+
   //console.log('sql=',sql)
   //console.log('rows= ',rows)
   //res.json(rows) 
@@ -76,84 +81,60 @@ router.get('/str/:str', async function(req, res, next) {
   })
  */
 
-    // Voltage stats
-    Vstat = {} 
-    vKeys = Object.keys(rows[0][0])
-    vVals = Object.values(rows[0][0])
-    vHash = rows[0][0]
-    vKeys.shift()
-    vVals.shift()
-    
-    Vstat['vSum'] = vVals.sum().toFixed(0)
-    Vstat['vAve'] = (Vstat['vSum']/vVals.length).toFixed(1)
-        
-    vKeys.sort((a,b)=>{return vHash[a]-vHash[b]})
+  // Voltage stats
+  vKeys = Object.keys(rows[0][0])
+  vVals = Object.values(rows[0][0])
+  vHash = rows[0][0]
+  vKeys.shift()
+  vVals.shift()
+  
+  innerHTML['vSum'] = vVals.sum().toFixed(0)
+  innerHTML['vAve'] = (innerHTML['vSum']/vVals.length).toFixed(1)
+      
+  vKeys.sort((a,b)=>{return vHash[a]-vHash[b]})
 
-    // Max and min Voltage data
-    let VminTray = {}
-    let VminVal = {}
-    let VmaxTray = {}
-    let VmaxVal = {}
-    const reTray = /(\d+)$/
-    
-    for (let i = 0;i<10;i++){
+  // Max/Min voltage
+  const reTray = /(\d+)$/
+  
+  for (let i = 0;i<10;i++){
 
-      let tray = reTray.exec(vKeys[i])[0]
+    let tray = reTray.exec(vKeys[i])[0]
 
-      VminTray["VminTray" + i] = tray
-      VminVal["VminVal" + i] = vHash[vKeys[i]]
+    innerHTML["VminTray" + i] = tray
+    innerHTML["VminVal" + i] = vHash[vKeys[i]]
 
-      let offset = (vKeys.length-10) - i; 
-      tray = reTray.exec(vKeys[offset])[0]
+    let offset = (vKeys.length-10) - i; 
+    tray = reTray.exec(vKeys[offset])[0]
 
-      VmaxTray["VmaxTray" + i] = tray
-      VmaxVal["VmaxVal" + i] = vHash[vKeys[offset]]
-    }
+    innerHTML["VmaxTray" + i] = tray
+    innerHTML["VmaxVal" + i] = vHash[vKeys[offset]]
+  }
 
-    // Temperature stats
-    Tstat = {} 
-    tKeys = Object.keys(rows[1][0])
-    tVals = Object.values(rows[1][0])
-    tHash = rows[1][0]
-    tKeys.shift()
-    tVals.shift()
+  // Temperature stats
+  let tKeys = Object.keys(rows[1][0])
+  let tVals = Object.values(rows[1][0])
+  let tHash = rows[1][0]
+  tKeys.shift()
+  tVals.shift()
 
-    Tstat['tAve'] = (tVals.sum()/tVals.length).toFixed(1)
-        
-    // Descending sort
-    tKeys.sort((a,b)=>{return tHash[b]-tHash[a]})
+  innerHTML['tAve'] = (tVals.sum()/tVals.length).toFixed(1)
+      
+  // Descending sort
+  tKeys.sort((a,b)=>{return tHash[b]-tHash[a]})
 
-    // Max Temperature data
-    let TmaxTray = {}
-    let TmaxVal = {}
-    
-    for (let i = 0;i<10;i++){
+  // Max Temperature data
+  for (let i = 0;i<10;i++){
+    let tray = reTray.exec(tKeys[i])[0]
 
-      let tray = reTray.exec(tKeys[i])[0]
-
-      TmaxTray["TmaxTray" + i] = tray
-      TmaxVal["TmaxVal" + i] = tHash[tKeys[i]]
-    }
-    
-    // Prepare to return
-    let rtn = {}
-    rtn['volts'] = rows[0][0]
-    rtn['temperature'] = rows[1][0]
-    rtn['impedance'] = rows[2][0]
-    rtn['VminTray'] = VminTray
-    rtn['VminVal']  = VminVal
-    rtn['VmaxTray'] = VmaxTray
-    rtn['VmaxVal']  = VmaxVal
-    rtn['VStat']    = Vstat
-    rtn['TmaxTray'] = TmaxTray
-    rtn['TmaxVal']  = TmaxVal
-    rtn['TStat']    = Tstat
- 
-    res.json(rtn) 
+    innerHTML["TmaxTray" + i] = tray
+    innerHTML["TmaxVal" + i] = tHash[tKeys[i]]
+  }
+  
+  res.json({innerHTML:innerHTML}) 
 })
   
 // -----------------------------------------------------------
-// HOME
+// HOME Page
 // -----------------------------------------------------------
 router.get('/home', async function(req, res, next) {
 
@@ -180,8 +161,6 @@ router.get('/home', async function(req, res, next) {
   vKeys.shift()
   vVals.shift()
   
-  console.log('length =',vVals.length)
-
   // Calculate string series voltage
   for (let i=0;i<4;i++){
     rtnObj['vSumStr'+i] = (vVals.splice(0,69).sum().toFixed(0))
@@ -255,8 +234,8 @@ router.get('/home', async function(req, res, next) {
   
   // Prepare to return
   let rtn = {}
-  rtn['innerHtml'] = rtnObj
-  rtn['flt_alm'] = flt_alm_lst
+  rtn['innerHTML'] = rtnObj
+  rtn['fltAlm'] = flt_alm_lst
  
   res.json(rtn) 
 })
@@ -279,21 +258,18 @@ router.get('/sys', async function(req, res, next) {
    console.log(req.query.id,req.query.cmd)
   }
 
-  var procObj = {}
+  let rtnObj = {}
   for (const key in cmdObj) {
-    procObj[key + '_pid'] = '--'
-    procObj[key + '_cpu'] = '--'
-    procObj[key + '_mem'] = '--'
-    procObj[key + '_btn'] = 'START'
+    rtnObj['innerHTML'][key + '_pid'] = '--'
+    rtnObj['innerHTML'][key + '_cpu'] = '--'
+    rtnObj['innerHTML'][key + '_mem'] = '--'
+    rtnObj['innerHTML'][key + '_btn'] = 'START'
   }
 
-  var classObj = {}
-  
   try {
     var stdout = execSync("journalctl --unit=bems_gui -n 50 --no-pager",{timeout:2000,encoding:'utf8'})
     let err_lst = stdout.split("\n")
-    var stdoutBr = err_lst.join("<br>")
-
+    rtnObj['innerHTML']['logTail'] = err_lst.join("<br>")
     
     stdout = execSync("ps aux",{timeout:2000,encoding:'utf8'})
     let lst = []
@@ -313,20 +289,20 @@ router.get('/sys', async function(req, res, next) {
             
             for (key in cmdObj) {
 
-                if ( procObj.hasOwnProperty(key + '_fnd') ) {
+                if ( rtnObj['innerHTML'].hasOwnProperty(key + '_fnd') ) {
                   continue; 
                 }  
                 // might need a regexp instead
                 if ( cmdObj[key]['cmd'] === cmdStr ) {
             
-                  procObj[key + '_pid'] = lstLst[i][1]
-                  procObj[key + '_cpu'] = lstLst[i][2]
-                  procObj[key + '_mem'] = lstLst[i][3]
-                  procObj[key + '_btn'] = 'RESTART'
+                  rtnObj['innerHTML'][key + '_pid'] = lstLst[i][1]
+                  rtnObj['innerHTML'][key + '_cpu'] = lstLst[i][2]
+                  rtnObj['innerHTML'][key + '_mem'] = lstLst[i][3]
+                  rtnObj['innerHTML'][key + '_btn'] = 'RESTART'
 
-                  procObj[key + '_fnd'] = true // used to continue above as we found our process
+                  rtnObj['innerHTML'][key + '_fnd'] = true // used to continue above as we found our process
 
-                  classObj[key] = {add:'text-succes'}
+                  rtnObj['classList'][key] = {add:'text-succes'}
                 }
                
             } // end for
@@ -334,17 +310,11 @@ router.get('/sys', async function(req, res, next) {
     }
   }
     catch(error) {
-      console.log("Error in xhr sys ",error);
+      console.log("Error in xhr sys ",error);rt
   }
 
-
   // Prepare to return
-  let rtn = {}
-  rtn['proc'] = procObj
-  rtn['log'] = {logTail:stdoutBr}
- 
-
-  res.json(rtn) 
+  res.json(rtnObj) 
 
 })
 
