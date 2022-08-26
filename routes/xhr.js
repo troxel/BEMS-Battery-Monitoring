@@ -220,6 +220,7 @@ router.get('/home', async function(req, res, next) {
   
   }
   
+  // --- Alarms and Faults
   sql = `select  time,incident_id,flt_sw from flt_alm_buffer;select incident_id,incident_str from flt_alm_msg`;
   rows = await db.querys(sql)
 
@@ -232,6 +233,12 @@ router.get('/home', async function(req, res, next) {
     flt_alm_lst.push({ts:timefmt, msg:flt_alm_msg[id],flt_sw:sw})
   }  
   
+  sql = `select * from i_prop_str order by time desc limit 1`;
+  
+  let iPropRows = await db.querys(sql)
+
+  for (const k in iPropRows[0]) rtnObj[k] = iPropRows[0][k] 
+
   // Prepare to return
   let rtn = {}
   rtn['innerHTML'] = rtnObj
@@ -252,6 +259,7 @@ cmdObj['bems_aux']  = {lbl:'Bems Aux',cmd:'bems_aux.exe'}
 cmdObj['bems_env']  = {lbl:'Bems Env',cmd:'bems_env.exe'}
 cmdObj['sbs_dcm']  = {lbl:'Bems SBS',cmd:'sbs_dcm.py'}
 
+// ------------------------------------------------
 router.get('/sys', async function(req, res, next) {
 
   if ( req.query.id ) {
