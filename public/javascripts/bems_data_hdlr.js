@@ -118,6 +118,47 @@ function get_sys_data(action) {
    });
 }
 
+// ----------------------------------------------------------
+// ------------------------- Charge -------------------------
+// ----------------------------------------------------------
+function get_chg_data(action) {
+
+   var url = `${url_srv}/chg/xhr`;
+
+   if ( typeof action != 'undefined') {
+      if ( 'id' in action) {
+         url += `?id=${action.id}&cmd=${action.cmd}`
+      }
+   }
+
+   var xhr = $.ajax({
+         url: url,
+         success: function(data){ 
+            if ( data['error'] ) {
+               this.error(this.xhr,this.textStatus,data['error'])
+               return
+            }
+         
+            // --- display by id ----
+            let dh = dataHdlr()
+            dh.process(data)
+
+            highlightVolts()
+            highlightBalance()
+
+         },
+         complete: function(){
+            // clear previous so don't stack'm up
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(get_chg_data,9000)
+         },
+         error: function (jqXhr, textStatus, errorMessage) {
+            console.error('Ajax Error! ' + errorMessage);
+         },
+         timeout:30000,
+         dataType: 'json',        
+   });
+}
 
 // ----------------- Set Points ------------------
 // Global used by getSetPoints() and setSetPoints()
@@ -128,6 +169,8 @@ spHsh['spLowVolt']  = 12
 spHsh['spHighVoltChrg'] = 13
 spHsh['spLowVoltChrg']  = 12
 spHsh['spHighTemp'] = 80
+spHsh['spHighBalance'] = .9
+spHsh['spLowBalance']  = .3
 
 // -----------------------------------
 function getSetPoints() {
@@ -253,6 +296,8 @@ function fltAlm(flt_alm_lst) {
 // ------------------------------------
 // --- Highlighting  ------------------
 // ------------------------------------
+
+// ---------- Highlight Volts ---------
 function highlightVolts() {
    var ids = document.querySelectorAll('[id]');
    
@@ -262,7 +307,6 @@ function highlightVolts() {
    let spLowVolt = document.getElementById("spLowVolt").value
    let numHighVolt = 0
    let numLowVolt  = 0
-
    ids.forEach( (el, inx) => {
       if ( re.test(el.id) ) {
 
@@ -285,6 +329,7 @@ function highlightVolts() {
    if ( numEl != null ) numEl.innerHTML = numLowVolt
 }
 
+// ---------- Highlight Volts ---------
 function highlightTemps() {
    var ids = document.querySelectorAll('[id]');
    
@@ -307,6 +352,40 @@ function highlightTemps() {
 
    let numEl = document.getElementById('numHighTemp')
    if ( numEl != null ) numEl.innerHTML = numHighTemp
+}
+
+// ---------- Highlight Balance ---------
+// Need to check is there too high balance
+// Probably not 
+function highlightBalance() {
+   var ids = document.querySelectorAll('[id]');
+   
+   const re = /^b\d+/
+
+   let spHighBalance = document.getElementById("spHighBalance").value
+   let spLowBalance = document.getElementById("spLowBalance").value
+   let numHighBalance = 0
+   let numLowBalance  = 0
+   ids.forEach( (el, inx) => {
+      if ( re.test(el.id) ) {
+
+         let val = parseFloat(el.innerText)
+         el.style.backgroundColor  = "forestgreen"
+         if ( val >= spHighBalance) {
+            el.style.backgroundColor  = "#EE2222"
+            numHighBalance++
+         }else if ( val <= spLowBalance ){
+            el.style.backgroundColor  = "#DDDD11"
+            numLowBalance++
+         } 
+      } 
+   })
+
+   let numEl = document.getElementById('numHighBalance')
+   if ( numEl != null ) numEl.innerHTML = numHighBalance
+         
+   numEl = document.getElementById('numLowBalance')
+   if ( numEl != null ) numEl.innerHTML = numLowBalance
 }
 
 // ------------------------------------

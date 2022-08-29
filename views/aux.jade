@@ -9,15 +9,15 @@ block content
       hr
   .container
 
-    .row.border(style="background-color: #d0d4c0;")
+    .row.border(style="background-color: #f0e4c0;")
       .col-2
         table.maxmin(class="table-bordered caption-top")
           caption= "Maximum Voltages"
-          th Tray 
+          th Cell  
           th Volts
 
           - var row = 0
-          while (row < 10)
+          while (row < 18)
             tr
               td(id="VmaxTray#{row}")
               td 
@@ -52,21 +52,25 @@ block content
 
       .col-7
         table(class="table-bordered caption-top traytbl", style="width:400px")
-          caption Tray Voltages
-          - var offset_cell = str_id * 70 + 1 
-          - var rows = 7
+          caption Aux Cell Voltages
           - var cols = 10
-          - var row_cnt = 0
-          while (row_cnt < rows)
+          - var cell_cnt = 1
+          - var cells = 186
+          while (cell_cnt < cells)
             tr
-              - var col_cnt = 0
-              while (col_cnt < cols)
-                - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="v#{cell_cnt}", title="v#{cell_cnt}") &nbsp;
-                - col_cnt++
-              - offset_cell = offset_cell + cols
-              - row_cnt++
-        include includes/spVolts.jade
+                -col_cnt = 0
+                while (col_cnt <= cols)
+                  td(id="v#{cell_cnt}", title="v#{cell_cnt}") &nbsp;
+                  - col_cnt++
+                  - cell_cnt++
+
+        .form-group(style="margin-top:4px; margin-bottom:3px;")
+          //- button.spSubmit.btn.btn-primary.btn-sm(type="submit") Set
+          label() Voltage Setpoints High
+          input#spHighVolt.spVal(size="2")
+          label() Low
+          input#spLowVolt.spVal(size="2")
+
     .row(style="margin-top:10px; background-color: #d0d4c0;")
       .col-3
         table.maxmin.table-bordered.caption-top()
@@ -105,7 +109,10 @@ block content
                 - col_cnt++
               - offset_cell = offset_cell + cols
               - row_cnt++
-        include includes/spTemp.jade
+        .form-group(style="margin-top:4px; margin-bottom:3px;")
+          //- button.spSubmit.btn.btn-primary.btn-sm() Set
+          label() Temperature Setpoint High
+          input#spHighTemp.spVal(size="2")
     .row
       .col
       .col
@@ -126,6 +133,6 @@ block content
   script.
     $( document ).ready( () => {
       getSetPoints()   
-      get_str_data()
+      //get_str_data()
       document.getElementById("chg1").classList.add("active");
     })
