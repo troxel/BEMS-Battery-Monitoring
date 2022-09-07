@@ -6,7 +6,7 @@ const config = require('../config');
 
 var date = new Date();
 
-/* GET home page. */ 
+/* Render the HTML . */ 
 router.get('/', function(req, res, next) {
   let strHsh = {}
   res.render('chg', strHsh);
@@ -15,13 +15,11 @@ router.get('/', function(req, res, next) {
 //--------------------------------
 // --- XHR Data Handler
 //--------------------------------
-
 router.get('/xhr', async function(req, res, next) {
 
   let rtnObj = {}
   rtnObj['innerHTML'] = {}
  
-
   const sql = 'select * from volts order by time desc limit 1;select * from balance order by time desc limit 1;'
   const rows = await db.querys(sql)
 

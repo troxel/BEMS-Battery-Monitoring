@@ -17,7 +17,7 @@ block content
           th Volts
 
           - var row = 0
-          while (row < 18)
+          while (row < 10)
             tr
               td(id="VmaxTray#{row}")
               td 
@@ -54,15 +54,18 @@ block content
         table(class="table-bordered caption-top traytbl", style="width:400px")
           caption Aux Cell Voltages
           - var cols = 10
-          - var cell_cnt = 1
+          - var rows = 19
+          - var row_cnt = 0
+          - var cell_cnt = 0
           - var cells = 186
-          while (cell_cnt < cells)
+          while (row_cnt++ < rows)
             tr
-                -col_cnt = 0
-                while (col_cnt <= cols)
-                  td(id="v#{cell_cnt}", title="v#{cell_cnt}") &nbsp;
-                  - col_cnt++
-                  - cell_cnt++
+              - var col_cnt = 0
+              while (col_cnt++ < cols)
+                if (cell_cnt++ < cells)
+                  td.cfs(id="va#{cell_cnt}", title="va#{cell_cnt}") #{cell_cnt} 
+                else
+                  td
 
         .form-group(style="margin-top:4px; margin-bottom:3px;")
           //- button.spSubmit.btn.btn-primary.btn-sm(type="submit") Set
@@ -96,19 +99,19 @@ block content
       .col-4
         table(class="table-bordered caption-top", style="width:400px")
           caption Tray Temperatures °F
-          - var offset_cell = str_id * 70 + 1 
-          - var rows = 7
           - var cols = 10
+          - var rows = 19
           - var row_cnt = 0
-          while (row_cnt < rows)
+          - var cell_cnt = 0
+          - var cells = 186
+          while (row_cnt++ < rows)
             tr
               - var col_cnt = 0
-              while (col_cnt < cols)
-                - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="t#{cell_cnt}") &nbsp;
-                - col_cnt++
-              - offset_cell = offset_cell + cols
-              - row_cnt++
+              while (col_cnt++ < cols)
+                if (cell_cnt++ < cells)
+                  td.cfs(id="ta#{cell_cnt}", title="ta#{cell_cnt}") #{cell_cnt} 
+                else
+                  td
         .form-group(style="margin-top:4px; margin-bottom:3px;")
           //- button.spSubmit.btn.btn-primary.btn-sm() Set
           label() Temperature Setpoint High
@@ -117,18 +120,6 @@ block content
       .col
       .col
       .col
-        table(class="table-bordered", style="width:400px")
-          - var k = 1
-          - var rows = start_cell + 7
-          - var cols = 10
-          while (start_cell++ < rows)
-            tr
-              - var j = 0
-              while (j < cols)
-                - cnt = j + k
-                - j++
-                td.cfs(id="b#{cnt}") v#{cnt}
-              - k = k + j
 
   script.
     $( document ).ready( () => {

@@ -30,9 +30,6 @@ str += ");"
 console.log(str)
 console.log("#-----------------------------------")
 
-
-
-
 var str = 'CREATE TABLE i_prop_str ( time timestamp not null default current_timestamp primary key,i_str0 float,i_str1 float,i_str2 float,i_str3 float);'
 console.log(str)
 console.log("#-----------------------------------")
@@ -48,6 +45,26 @@ var str = 'CREATE TABLE flt_alm_msg ( incident_id int UNSIGNED PRIMARY KEY, inci
 console.log(str)
 console.log("#-----------------------------------")
 
-var str = `CREATE TABLE string_current ( time timestamp not null default current_timestamp primary key,str1 float,str2 float,str3 float,str4 float,`
+/* var str = `CREATE TABLE string_current ( time timestamp not null default current_timestamp primary key,str1 float,str2 float,str3 float,str4 float,`
 str += tLst.join(',')
 str += ");"
+
+console.log(str)
+console.log("#-----------------------------------") */
+
+const envLst = ['batt_h2_1','batt_fire_1','batt_smoke',
+			'ee_fire','ee_smoke','machine_fire','machine_smoke',
+			'batt_h2_2','batt_fire_2','batt_temp','ee_temp','machine_temp_1','machine_temp_2'];
+
+let envStrLst = []
+for (let item of envLst) {
+	envStrLst.push(item + ' float')
+}
+
+let envStr = envStrLst.join(',')
+
+str = `CREATE TABLE env ( time timestamp not null default current_timestamp primary key,${envStr});`
+console.log(str)
+console.log("#-----------------------------------")
+
+
