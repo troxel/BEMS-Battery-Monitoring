@@ -52,6 +52,9 @@ block content
   script.
     $( document ).ready( () => {
       getSetPoints()   
-      get_chg_data()
+
+      data_xhr = get_chg_data
+      data_xhr()
+
       document.getElementById("chg").classList.add("active");
     })

@@ -21,6 +21,9 @@ var randomValues = {
 	},
 	va: function(){
 		return( ( 11 + (Math.random() * 3)).toFixed(2) )
+	},
+	temperature_aux: function(){
+		return( ( 68 + (Math.random() * 14)).toFixed(2) )
 	}
 }
 
@@ -95,7 +98,22 @@ function insert_aux_rows(){
 	//console.log(sql)
 	con.query(sql, function (err, result) {
 	  if (err) throw err;
-	  console.log(`1 aux record inserted`);
+	  console.log(`1 volts_aux record inserted`);
 	});	
+
+	let tmpLst = [];
+	for (let i=0;i<6;i++){
+		tmpLst.push( randomValues['temperature_aux']() )
+	}
+	let tmpStr = tmpLst.join(',')
+
+	var sql = `INSERT INTO temperature_aux VALUES (NULL,${tmpStr})`;
+
+	//console.log(sql)
+	con.query(sql, function (err, result) {
+	  if (err) throw err;
+	  console.log(`1 temperature_aux record inserted`);
+	});	
+
 }
 

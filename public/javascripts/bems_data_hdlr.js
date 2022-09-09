@@ -4,6 +4,14 @@ const port = window.location.port
 var url_srv = `${proto}//${host}:${port}`;
 var timeoutId
 
+// global var used to associate a page with its xhr call
+// See assignment in html page
+var data_xhr
+
+// ------------------------- get functions--------------------
+// -- get xhr data for the various screens
+// -----------------------------------------------------------
+
 // ------------------------- String --------------------------
 function get_str_data() {
 
@@ -37,7 +45,7 @@ function get_str_data() {
             highlightTemps()
          },
          complete: function(){
-            setTimeout(get_str_data,5000)
+            setTimeout(get_str_data,3000)
          },
          error: function (jqXhr, textStatus, errorMessage) {
             console.error('Ajax Error! ' + errorMessage);
@@ -119,7 +127,7 @@ function get_sys_data(action) {
 }
 
 // ----------------------------------------------------------
-// ------------------------- Charge -------------------------
+// ----------------------  get Charge -----------------------
 // ----------------------------------------------------------
 function get_chg_data(action) {
 
@@ -160,6 +168,44 @@ function get_chg_data(action) {
    });
 }
 
+// ----------------------------------------------------------
+// ------------------------get Aux    -----------------------
+// ----------------------------------------------------------
+function get_aux_data() {
+
+   const url = `${url_srv}/aux/xhr`;
+
+   var xhr = $.ajax({
+         url: url,
+         success: function(data){ 
+            if ( data['error'] ) {
+               this.error(this.xhr,this.textStatus,data['error'])
+               return
+            }
+         
+            // --- display by id ----
+            let dh = dataHdlr()
+            dh.process(data)
+
+            highlightTempsAux()
+            highlightVolts()
+
+         },
+         complete: function(){
+            // clear previous so don't stack'm up
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(get_aux_data,9000)
+         },
+         error: function (jqXhr, textStatus, errorMessage) {
+            console.error('Ajax Error! ' + errorMessage);
+         },
+         timeout:30000,
+         dataType: 'json',        
+   });
+}
+
+// -------------- End get functions ----------------
+
 // ----------------- Set Points ------------------
 // Global used by getSetPoints() and setSetPoints()
 // Defaults
@@ -169,6 +215,7 @@ spHsh['spLowVolt']  = 12
 spHsh['spHighVoltChrg'] = 13
 spHsh['spLowVoltChrg']  = 12
 spHsh['spHighTemp'] = 80
+spHsh['spHighTempAux'] = 80
 spHsh['spHighBalance'] = .9
 spHsh['spLowBalance']  = .3
 
@@ -193,7 +240,8 @@ function getSetPoints() {
 }
 
 // ------------------------------------
-// --- Data Handler ------------------
+// --- Data Handler -------------------
+// automate displaying data
 // ------------------------------------
 function dataHdlr(hdlrObj) {
 
@@ -206,9 +254,15 @@ function dataHdlr(hdlrObj) {
    this.innerHTML = function(data)
    {
       for (let key in data) {
-         let elid = document.getElementById(key)
-         if ( elid != null ) {
-            elid.innerHTML = data[key]
+
+         if (typeof(data[key]) === 'object' ) {
+            innerHTML(data[key])  // yep recursive
+         } 
+         else {
+            let elid = document.getElementById(key) 
+            if ( elid != null ) {
+               elid.innerHTML = data[key]
+            }
          }
       }
    }
@@ -301,7 +355,7 @@ function fltAlm(flt_alm_lst) {
 function highlightVolts() {
    var ids = document.querySelectorAll('[id]');
    
-   const re = /^v\d+/
+   const re = /^va?\d+/
 
    let spHighVolt = document.getElementById("spHighVolt").value
    let spLowVolt = document.getElementById("spLowVolt").value
@@ -383,9 +437,30 @@ function highlightBalance() {
 
    let numEl = document.getElementById('numHighBalance')
    if ( numEl != null ) numEl.innerHTML = numHighBalance
-         
+
    numEl = document.getElementById('numLowBalance')
    if ( numEl != null ) numEl.innerHTML = numLowBalance
+}
+
+function highlightTempsAux() {
+
+   // The aux temps are a short list, explicity call out lst
+   let auxTempLst = ['aux_cell_temp_1','aux_cell_temp_2','aux_cell_temp_3','aux_cell_temp_4','aux_amb_temp_1','aux_amb_temp_2']
+ 
+   let spHighTempAux = document.getElementById("spHighTempAux").value
+ 
+   for (let id of auxTempLst) {
+
+      let el = document.getElementById(id)
+
+      if ( el != null ) {
+         let val = parseFloat(el.innerText)
+         el.style.backgroundColor  = "forestgreen"
+         if (val >= spHighTempAux) {
+            el.style.backgroundColor  = "#EE2222"
+         } 
+      }
+   }
 }
 
 // ------------------------------------
@@ -394,7 +469,9 @@ function highlightBalance() {
 $( document ).ready( () => {
   
    // Set Point Change
-   $(".spVal").change( () => {
+   $(".spVal").change( (event) => {
+
+      //if(event.keycode == '13'){}
 
       let keys = Object.keys(spHsh);
       for(let i = 0; i< keys.length;i++) {
@@ -407,8 +484,11 @@ $( document ).ready( () => {
          }
       }
 
-      highlightVolts()
-      highlightTemps()
+      console.log(event.target.id)
+
+      data_xhr()
+      //highlightVolts()
+      //highlightTemps()
    })
 
    $("#clearFaults").click( () => { 

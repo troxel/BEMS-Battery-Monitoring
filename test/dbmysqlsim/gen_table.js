@@ -62,9 +62,21 @@ for (let item of envLst) {
 }
 
 let envStr = envStrLst.join(',')
-
 str = `CREATE TABLE env ( time timestamp not null default current_timestamp primary key,${envStr});`
 console.log(str)
 console.log("#-----------------------------------")
 
+
+const auxTmpLst = ['aux_cell_temp_1','aux_cell_temp_2','aux_cell_temp_3','aux_cell_temp_4',
+'aux_amb_temp_1','aux_amb_temp_2'];
+
+let auxTmpStrLst = []
+for (let item of auxTmpLst) {
+	auxTmpStrLst.push(item + ' float')
+}
+
+let auxStr = auxTmpStrLst.join(',')
+str = `CREATE TABLE temperature_aux ( time timestamp not null default current_timestamp primary key,${auxStr});`
+console.log(str)
+console.log("#-----------------------------------")
 

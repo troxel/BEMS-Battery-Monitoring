@@ -24,7 +24,7 @@ router.get('/xhr', async function(req, res, next) {
   const rows = await db.querys(sql)
 
   rtnObj['innerHTML'] = rows[0][0]
-  rtnObj['innerHTML'] = {...rtnObj['innerHTML'],...rows[1][0]}
+  rtnObj['innerHTML']['balance'] = rows[1][0]
 
   res.json(rtnObj)
 

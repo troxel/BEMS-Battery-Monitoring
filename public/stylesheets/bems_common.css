@@ -15,6 +15,12 @@ nav {
 }
 
 .cfs { font-size: 14px;padding:3px;}
+
+.caption {padding-top: 0.5rem;
+   padding-bottom: 0.5rem;
+   color: #6c757d;
+   text-align: left;}
+
 .traytbl { }
 
 .chg-tbl {

@@ -75,47 +75,34 @@ block content
           input#spLowVolt.spVal(size="2")
 
     .row(style="margin-top:10px; background-color: #d0d4c0;")
-      .col-3
-        table.maxmin.table-bordered.caption-top()
-          caption Maximum Temperature
-          th Tray 
-          th °F
-
-          - var row = 0
-          while (row < 10)
-            tr
-              td(id="TmaxTray#{row}")
-              td 
-                span(id="TmaxVal#{row}") 
-                span  °F
-              - row++
-        table.maxmin
-          tr
-            td High Temp Trays
-            td#numHighTemp 
-            td
+      
 
       .col-2
-      .col-4
-        table(class="table-bordered caption-top", style="width:400px")
-          caption Tray Temperatures °F
-          - var cols = 10
-          - var rows = 19
-          - var row_cnt = 0
-          - var cell_cnt = 0
-          - var cells = 186
-          while (row_cnt++ < rows)
+        .caption Aux Current amps
+        table(class="table-bordered caption-top")
             tr
-              - var col_cnt = 0
-              while (col_cnt++ < cols)
-                if (cell_cnt++ < cells)
-                  td.cfs(id="ta#{cell_cnt}", title="ta#{cell_cnt}") #{cell_cnt} 
-                else
-                  td
-        .form-group(style="margin-top:4px; margin-bottom:3px;")
+              td.cfs(id="aux_current", title="aux_current", width="40px")  1
+      .col-3
+        .caption Aux Cell Temperatures °F
+        table(class="table-bordered caption-top")
+            tr
+              td.cfs(id="aux_cell_temp_1", title="aux_cell_temp_1", width="40px")  1
+              td.cfs(id="aux_cell_temp_2", title="aux_cell_temp_2", width="40px")  2
+              td.cfs(id="aux_cell_temp_3", title="aux_cell_temp_3", width="40px")  3
+              td.cfs(id="aux_cell_temp_4", title="aux_cell_temp_4", width="40px")  4
+      .col-3 
+        .caption Aux Ambient Temperatures °F
+        table(class="table-bordered caption-top")
+            tr
+              td.cfs(id="aux_amb_temp_1", title="aux_amb_temp_1", width="40px")  1
+              td.cfs(id="aux_amb_temp_2", title="aux_amb_temp_2", width="40px")  2
+    .row(style="margin-bottom:10px; background-color: #d0d4c0;")
+      .col-2
+      .col-4
+        .form-group(style="margin-top:10px; margin-bottom:10px;")
           //- button.spSubmit.btn.btn-primary.btn-sm() Set
-          label() Temperature Setpoint High
-          input#spHighTemp.spVal(size="2")
+          label() Aux Temperature Setpoint High
+          input#spHighTempAux.spVal(size="2")
     .row
       .col
       .col
@@ -123,7 +110,10 @@ block content
 
   script.
     $( document ).ready( () => {
-      getSetPoints()   
-      //get_str_data()
-      document.getElementById("chg1").classList.add("active");
+      getSetPoints()
+
+      data_xhr = get_aux_data
+      data_xhr()
+      
+      //document.getElementById("aux").classList.add("active");
     })
