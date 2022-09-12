@@ -35,10 +35,8 @@ block content
           - var row = 0
           while (row < 10)
             tr
-              td(id="VminTray#{row}")
-              td
-                span(id="VminVal#{row}") 
-                span  v
+              td(id="vMinKey#{row}")
+              td(id="vMinVal#{row}")
               - row++
 
         table.maxmin.table-bordered.caption-top()
@@ -49,12 +47,9 @@ block content
           - var row = 0
           while (row < 10)
             tr
-              td(id="TmaxTray#{row}")
-              td 
-                span(id="TmaxVal#{row}") 
-                span  °F
+              td(id="tMaxKey#{row}")
+              td(id="tMaxVal#{row}") 
               - row++
-
       .col
         table.table-bordered.w-100
           thead

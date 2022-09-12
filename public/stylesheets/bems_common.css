@@ -41,3 +41,6 @@ nav {
 .maxmin caption { font-size: 14px; padding:0px; }
 
 .spVal {height:21px; ;}
+
+.go { background-color: green;}
+.nogo { background-color: red;}

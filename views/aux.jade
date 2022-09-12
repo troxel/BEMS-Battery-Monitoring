@@ -19,10 +19,8 @@ block content
           - var row = 0
           while (row < 10)
             tr
-              td(id="VmaxTray#{row}")
-              td 
-                span(id="VmaxVal#{row}") 
-                span  v
+              td(id="vMaxKey#{row}")
+              td(id="vMaxVal#{row}") &nbsp;
               - row++
         table.maxmin
           tr
@@ -39,10 +37,8 @@ block content
           - var row = 0
           while (row < 10)
             tr
-              td(id="VminTray#{row}")
-              td
-                span(id="VminVal#{row}") 
-                span  v
+              td(id="vMinKey#{row}")
+              td(id="vMinVal#{row}") &nbsp;
               - row++
         table.maxmin
           tr
@@ -77,11 +73,11 @@ block content
     .row(style="margin-top:10px; background-color: #d0d4c0;")
       
 
-      .col-2
+      .col-4
         .caption Aux Current amps
         table(class="table-bordered caption-top")
             tr
-              td.cfs(id="aux_current", title="aux_current", width="40px")  1
+              td.cfs(id="i_aux", title="i_aux", width="40px", style="background-color:white;")  1
       .col-3
         .caption Aux Cell Temperatures °F
         table(class="table-bordered caption-top")
@@ -97,7 +93,7 @@ block content
               td.cfs(id="aux_amb_temp_1", title="aux_amb_temp_1", width="40px")  1
               td.cfs(id="aux_amb_temp_2", title="aux_amb_temp_2", width="40px")  2
     .row(style="margin-bottom:10px; background-color: #d0d4c0;")
-      .col-2
+      .col-4
       .col-4
         .form-group(style="margin-top:10px; margin-bottom:10px;")
           //- button.spSubmit.btn.btn-primary.btn-sm() Set

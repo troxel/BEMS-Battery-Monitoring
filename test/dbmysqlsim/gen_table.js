@@ -80,3 +80,10 @@ str = `CREATE TABLE temperature_aux ( time timestamp not null default current_ti
 console.log(str)
 console.log("#-----------------------------------")
 
+str = 'CREATE TABLE i_aux ( time timestamp not null default current_timestamp primary key, i_aux float);'
+console.log(str)
+console.log("#-----------------------------------")
+
+str = 'CREATE TABLE error_wd ( time timestamp not null default current_timestamp primary key, error_wd1  SMALLINT UNSIGNED , error_wd2  SMALLINT UNSIGNED , error_wd3  SMALLINT UNSIGNED , error_wd4  SMALLINT UNSIGNED , error_wd5  SMALLINT UNSIGNED , error_wd6  SMALLINT UNSIGNED , error_wd7  SMALLINT UNSIGNED , error_wd8  SMALLINT UNSIGNED );'
+console.log(str)
+console.log("#-----------------------------------")

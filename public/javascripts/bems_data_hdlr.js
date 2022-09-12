@@ -41,7 +41,7 @@ function get_str_data() {
             dh.process(data)
             
             // highlights
-            highlightVolts()
+            highlightVolts(/^v\d+/)
             highlightTemps()
          },
          complete: function(){
@@ -55,10 +55,12 @@ function get_str_data() {
    });
 }
 
+// ----------------------------------------------------------
 // ------------------------- Home --------------------------
+// ----------------------------------------------------------
 function get_home_data(clearFaults=0) {
    
-   var url = `${url_srv}/xhr/home`;
+   var url = `${url_srv}/xhr`;
    if (clearFaults) {
       url += '?clearFaults=1'
    }
@@ -74,6 +76,7 @@ function get_home_data(clearFaults=0) {
 
             dh = dataHdlr({fltAlm:fltAlm})
             dh.process(data)
+            highlightVolts(/^vM\w+?Val\d+/)
             
          },
          complete: function(){
@@ -151,7 +154,7 @@ function get_chg_data(action) {
             let dh = dataHdlr()
             dh.process(data)
 
-            highlightVolts()
+            highlightVolts(/^v\d+/)
             highlightBalance()
 
          },
@@ -188,7 +191,8 @@ function get_aux_data() {
             dh.process(data)
 
             highlightTempsAux()
-            highlightVolts()
+            highlightVolts(/^va\d+/)
+            highlightVolts(/^vM\w+?Val\d+/)
 
          },
          complete: function(){
@@ -200,6 +204,38 @@ function get_aux_data() {
             console.error('Ajax Error! ' + errorMessage);
          },
          timeout:30000,
+         dataType: 'json',        
+   });
+}
+
+// ----------------------------------------------------------
+// ------------------------get env xhr    -----------------------
+// ----------------------------------------------------------
+function get_env_data() {
+
+   const url = `${url_srv}/env/xhr`;
+
+   var xhr = $.ajax({
+         url: url,
+         success: function(data){ 
+            if ( data['error'] ) {
+               this.error(this.xhr,this.textStatus,data['error'])
+               return
+            }
+         
+            // --- display by id ----
+            let dh = dataHdlr()
+            dh.process(data)
+         },
+         complete: function(){
+            // clear previous so don't stack'm up
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(get_env_data,9000)
+         },
+         error: function (jqXhr, textStatus, errorMessage) {
+            console.error('Ajax Error! ' + errorMessage);
+         },
+         timeout:5000,
          dataType: 'json',        
    });
 }
@@ -352,10 +388,10 @@ function fltAlm(flt_alm_lst) {
 // ------------------------------------
 
 // ---------- Highlight Volts ---------
-function highlightVolts() {
+function highlightVolts(re=/^v\d+/) {
    var ids = document.querySelectorAll('[id]');
    
-   const re = /^va?\d+/
+   //const re = /^va?\d+/
 
    let spHighVolt = document.getElementById("spHighVolt").value
    let spLowVolt = document.getElementById("spLowVolt").value
@@ -370,7 +406,7 @@ function highlightVolts() {
             el.style.backgroundColor  = "#EE2222"
             numHighVolt++
          }else if ( val <= spLowVolt ){
-            el.style.backgroundColor  = "#DDDD11"
+            el.style.backgroundColor  = "yellow"
             numLowVolt++
          } 
       } 

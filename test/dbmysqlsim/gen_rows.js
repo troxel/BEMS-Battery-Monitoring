@@ -11,7 +11,7 @@ var randomValues = {
 		return( (70 + (Math.random() * 20)).toFixed(2) )
 	},
 	b: function(){
-		return(  (Math.random() ).toFixed(2) )
+		return(  (Math.random() * 100 ).toFixed(2) )
 	},
 	r: function(){
 		return( (2 + (Math.random() * 3)).toFixed(2) )
@@ -24,6 +24,12 @@ var randomValues = {
 	},
 	temperature_aux: function(){
 		return( ( 68 + (Math.random() * 14)).toFixed(2) )
+	},
+	i_aux: function(){
+		return( ( 70 + (Math.random() * 40)).toFixed(2) )
+	},
+	env: function(){
+		return( ( 1.5 + (Math.random() * 0.5)).toFixed(2) )
 	}
 }
 
@@ -41,6 +47,7 @@ con.connect(function(err) {
   insert_tray_rows() // do inserts
   insert_current_rows()
   insert_aux_rows()
+  insert_env()
   con.end();
 });
 
@@ -85,6 +92,7 @@ function insert_current_rows(){
 	});	
 }
 
+// -------------------------------------
 function insert_aux_rows(){
 
 	let vaLst = []
@@ -113,7 +121,33 @@ function insert_aux_rows(){
 	con.query(sql, function (err, result) {
 	  if (err) throw err;
 	  console.log(`1 temperature_aux record inserted`);
+	});
+	
+	let i_aux = randomValues['i_aux']()
+	var sql = `INSERT INTO i_aux VALUES (NULL,${i_aux})`;
+
+	//console.log(sql)
+	con.query(sql, function (err, result) {
+	  if (err) throw err;
+	  console.log(`1 i_aux record inserted`);
 	});	
 
 }
 
+// -------------------------------------
+function insert_env(){
+
+	let vaLst = []
+	for ( let i=0;i<13;i++) {
+		vaLst.push( randomValues['env']() )
+	}
+
+	let valStr = vaLst.join(',')
+	var sql = `INSERT INTO env VALUES (NULL,${valStr})`;
+
+	//console.log(sql)
+	con.query(sql, function (err, result) {
+	  if (err) throw err;
+	  console.log(`1 env record inserted`);
+	});
+}
