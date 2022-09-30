@@ -2,6 +2,8 @@
 
 var mysql = require('mysql');
 
+// --------------- util ---------------------
+
 // ---------------------------
 var randomValues = {
 	v: function(){
@@ -48,6 +50,7 @@ con.connect(function(err) {
   insert_current_rows()
   insert_aux_rows()
   insert_env()
+  insert_error_wd(8,3)
   con.end();
 });
 
@@ -150,4 +153,57 @@ function insert_env(){
 	  if (err) throw err;
 	  console.log(`1 env record inserted`);
 	});
+}
+
+// -------------------------------------
+function insert_error_wd(wd,bit){
+
+	let errorLst = [0,0,0,0,0,0,0,0]
+
+	errorLst[wd-1] = 2**(bit - 1) 
+
+	let valStr = errorLst.join(',')
+	var sql = `INSERT INTO error_wd VALUES (NULL,${valStr});`;
+
+	console.log(sql,2**2,bit)
+
+	//console.log(sql)
+	con.query(sql, function (err, result) {
+	  if (err) throw err;
+	  console.log(`1 err_wd word=${wd} bit=${bit} record inserted`);
+	});
+}
+
+let bit = { 0:'0x0001',
+1:'0x0002',
+2:'0x0004',
+3:'0x0008',
+4:'0x0010',
+5:'0x0020',
+6:'0x0040',
+7:'0x0080',
+8:'0x0100',
+9:'0x0200',
+10:'0x0400',
+11:'0x0800',
+12:'0x1000',
+13:'0x2000',
+14:'0x4000',
+15:'0x8000',
+16:'0x00010000',
+17:'0x00020000',
+18:'0x00040000',
+19:'0x00080000',
+20:'0x00100000',
+21:'0x00200000',
+22:'0x00400000',
+23:'0x00800000',
+24:'0x01000000',
+25:'0x02000000',
+26:'0x04000000',
+27:'0x08000000',
+28:'0x10000000',
+29:'0x20000000',
+30:'0x40000000',
+31:'0x80000000'
 }

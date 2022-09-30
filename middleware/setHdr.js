@@ -9,27 +9,13 @@ module.exports = async function (req, res, next) {
   var dateNow = Date.now()
   var staleThreshold = 20
 
-  const sqlObj = { 
-    bems_sbs:'select time from volts order by time desc limit 1',
-    bems_aux:'select time from volts_aux order by time desc limit 1'
-  }
+  let sql = 'select count(*) from flt_buffer;select time from error_wd order by time desc limit 1'
+  rows = await db.querys(sql)
 
-  req.tStamp = {}
-  for (key in sqlObj) {
-    let rows; 
-   
-    rows = await db.querys(sqlObj[key])
-    if ( rows ) {
-      var dateI = new Date(rows[0].time)
-
-      // Calculate the difference in milliseconds
-      var diffSec = (dateNow - dateI)/1000
-
-      //if ( )
-      req.tStamp[key] = diffSec
-    } 
-  }
-
+  req.hdr = {}
+  req.hdr.fltNum = rows[0][0]['count(*)']
+  req.hdr.time = rows[1][0]['time']
+  
   next()
 }
 

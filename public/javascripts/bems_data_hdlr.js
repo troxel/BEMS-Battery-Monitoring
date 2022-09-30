@@ -5,8 +5,51 @@ var url_srv = `${proto}//${host}:${port}`;
 var timeoutId
 
 // global var used to associate a page with its xhr call
-// See assignment in html page
+// See assignment in html (jade) page 
 var data_xhr
+
+// Used by all pages to display spinner and time
+let spin = ['|','/','—','\\']
+let spinCnt = 0
+function spinner(time) {
+   let timeThreshold = 20000 // 20 seconds 
+
+   let spnId = document.getElementById('spn')
+   if ( spnId != null ) {
+      spnId.innerHTML = spin[spinCnt]
+      spinCnt++
+      spinCnt = spinCnt % 4
+
+      spnId.classList.remove('bg-danger')
+      spnId.classList.add('bg-success')
+   }
+
+   if ( time ) {
+      let diff = new Date() - new Date(time)
+      if ( diff > timeThreshold ){
+         timeFmt.classList.remove('bg-success')
+         timeFmt.classList.add('bg-danger')
+      } else {
+         timeFmt.classList.add('bg-success')
+         timeFmt.classList.remove('bg-danger')
+      }
+   }
+
+   let timeId = document.getElementById('timeFmt')
+   if ( timeId != null ) {
+   
+   }
+}
+
+function spinnerX() {
+
+   let spnId = document.getElementById('spn')
+   if ( spnId != null ) {
+      spnId.innerHTML = 'X'
+      spnId.classList.remove('bg-success')
+      spnId.classList.add('bg-danger')
+   }
+}
 
 // ------------------------- get functions--------------------
 // -- get xhr data for the various screens
@@ -37,7 +80,7 @@ function get_str_data() {
             }
 
             // --- Dispaly Data ----
-            dh = dataHdlr()
+            var dh = dataHdlr()
             dh.process(data)
             
             // highlights
@@ -74,19 +117,22 @@ function get_home_data(clearFaults=0) {
                return
             }
 
-            dh = dataHdlr({fltAlm:fltAlm})
+            spinner(data.time)
+
+            dh = dataHdlr({fltAlm:fltAlm}) // Add handler fault/alarm display
             dh.process(data)
-            highlightVolts(/^vM\w+?Val\d+/)
+            highlightVolts(/^vM\w+?Val\d+/) // matches vMaxVal or vMinVal
             
          },
          complete: function(){
             clearTimeout(timeoutId)
-            timeoutId = setTimeout(get_home_data,25000)
+            timeoutId = setTimeout(get_home_data,3000)
          },
          error: function (jqXhr, textStatus, errorMessage) {
             console.error('Ajax Error! ' + errorMessage);
+            spinnerX()
          },
-         timeout:30000,
+         timeout:7000,
          dataType: 'json',        
    });
 }
@@ -278,6 +324,7 @@ function getSetPoints() {
 // ------------------------------------
 // --- Data Handler -------------------
 // automate displaying data
+// Need to move this to a module
 // ------------------------------------
 function dataHdlr(hdlrObj) {
 
@@ -304,21 +351,66 @@ function dataHdlr(hdlrObj) {
    }
 
    // ------------------------------
-   // data[classList] = {elid:{add:myclass,remove:thatclass},... }
+   // data[classList] = {elid:{add:myclass,remove:thatclass},replace:['foo','bar']... }
    // ------------------------------
    this.classList = function(data) {
 
       for (let key in data) {
-         const elid = document.getElementById(key)
 
+         if (typeof(data[key]) === 'object' ) {
+            classList(data[key])
+         } 
+
+         const elid = document.getElementById(key)
          if ( elid != null ) {
             for (let method in data[key]){
-               elid.classList[method](data[key][method])
+               if ( Array.isArray(data[key][method]) ) {
+                  elid.classList[method](...data[key][method])
+               }
+               else {
+                  elid.classList[method](data[key][method])
+               }
             }
          }
       }
    }
 
+   // ------------------------------
+   // data[style] = {elid:{backgroundColor:'red'},  }
+   // ------------------------------
+   this.style = function(data) {
+
+      for (let id in data) {
+         
+         if (typeof(data[key]) === 'object' ) {
+            style(data[key])
+         } 
+
+         const elid = document.getElementById(id)
+         if ( elid != null ) {
+            for (let attr in data[id]) {
+               elid.style[attr] = data[id][attr]
+            }
+         }
+      }
+   }
+
+   //---------------------------------   
+   this.setAttribute = function(data) {
+       for (let id in data) {
+
+         if (typeof(data[id]) === 'object' ) {
+            this.setAttribute(data[id])
+         }
+
+         const elid = document.getElementById(id)
+         if ( elid != null ) {
+            for (let attr in data[id]) {
+               elid.setAttribute(attr,data[id][attr])
+            }
+         }
+      }
+   }
    this.src = function() {}
  
    // --- The crux --- 
@@ -337,22 +429,22 @@ function dataHdlr(hdlrObj) {
 
 // ------------------------------
 //  Data handler for the fault/alarm display
-//  Called fron within dataHdlr()
-//  flt_alm_lst = [ {ts:timestamp,msg:fltalmMsg},... ]
+//  Called from within dataHdlr()
+//  flt_alm_lst = [ {ts:timestamp,msg:fltalmMsg,flt:0/1},... ]
 // ------------------------------
-function fltAlm(flt_alm_lst) {
-   sortToggle = readCookie('sortToggle')
+function fltAlm(fltLst) {
+   let sortToggle = readCookie('sortToggle')
 
    // wipe it clean
-   let flt_alm_str = ''
-   let tbl = document.getElementById("flt_alm")
-   if (tbl == null) return
+   let fltStr = ''
+   let tblId = document.getElementById("flt_alm")
+   if (tblId == null) return  // why?
 
-   tbl.innerHTML = "";
+   tblId.innerHTML = "";
    
-   if ( flt_alm_lst.length == 0 ) {
+   if ( fltLst.length == 0 ) {
      
-      let row = tbl.insertRow(0)
+      let row = tblId.insertRow(0)
       if (row != null ) {
          row.classList.add("bg-success");
          row.classList.add("text-white");
@@ -367,14 +459,20 @@ function fltAlm(flt_alm_lst) {
  
       return
    }
+
+   fltLst.reverse()
    
-   for (let i = 0; i < flt_alm_lst.length; i++){
-      let row = tbl.insertRow(i)
+   // ---- Flt or Alm present  -----
+   for (let i = 0; i < fltLst.length; i++){
+      let row = tblId.insertRow(i)
       let cell0 = row.insertCell(0)
       let cell1 = row.insertCell(1)
-      cell0.innerHTML = flt_alm_lst[i]['ts']
-      cell1.innerHTML = flt_alm_lst[i]['msg']
-      if ( flt_alm_lst[i].flt_sw ) {
+
+      let timefmt = (new Date(fltLst[i]['time'])).toLocaleString('en-GB', { timeZone: 'America/Los_Angeles',hour24: false })
+
+      cell0.innerHTML = timefmt
+      cell1.innerHTML = fltLst[i]['msg']
+      if ( fltLst[i].flt ) {
          row.classList.add("bg-danger");
       }
       else {

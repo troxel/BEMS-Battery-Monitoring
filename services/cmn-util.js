@@ -31,6 +31,10 @@ function maxmin(hsh,prefix,len=10){
   return(rtnHsh)
 }
 
+// ---------------------------------------
+let bit = []  
+for(i=0;i<24;i++) { bit[i]=2**i }
+
 module.exports = {
-  maxmin
+  maxmin, bit
 }
