@@ -4,7 +4,7 @@ var router = express.Router();
 const db = require('../services/mysqldb');
 const config = require('../config');
 
-const b = require('../services/cmn-util').bit;
+const bit = require('../services/cmn-util').bit;
 
 var date = new Date();
 
@@ -43,7 +43,7 @@ router.get('/xhr', async function(req, res, next) {
 
   // ------------- err word 8 -------------------
   let error_wd8 = rows[1][0].error_wd8
-  let wd8 = {machine_temp_1:[bit[0],bit[1], machine_temp_2:[bit[2],bit[3], batt_temp:[bit[7],bit[8],ee_temp:[bit[4],bit[6]}
+  let wd8 = {machine_temp_1:[bit[0],bit[1]], machine_temp_2:[bit[2],bit[3]], batt_temp:[bit[7],bit[8]],ee_temp:[bit[4],bit[6]]}
 
   for (let key in wd8) {
 
@@ -58,7 +58,7 @@ router.get('/xhr', async function(req, res, next) {
 
   // ------------- err word 7 -------------------
   let error_wd7 = rows[1][0].error_wd7
-  let wd7 = {machine_smoke:bit[0, batt_smoke:bit[1, ee_smoke:bit[2, machine_fire:bit[3, ee_fire:bit[4,
+  let wd7 = {machine_smoke:bit[0], batt_smoke:bit[1], ee_smoke:bit[2], machine_fire:bit[3], ee_fire:bit[4],
     batt_fire_1:bit[5], batt_fire_2:bit[6], batt_h2_1:bit[9], batt_h2_2:bit[9] }
 
   for (let key in wd7) {
