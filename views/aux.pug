@@ -2,7 +2,7 @@ extends layout
 
 block content
 
-  input#str_id(type="hidden",value="#{str_id}")
+  input#str_id(type="hidden",value=str_id)
   .container
     .row  
       .col-xs String <span id="str_lbl">#{str_lbl}</span> Voltage <span id="vSum"></span> Voltage Ave <span id="vAve"></span>
@@ -19,8 +19,8 @@ block content
           - var row = 0
           while (row < 10)
             tr
-              td(id="vMaxKey#{row}")
-              td(id="vMaxVal#{row}") &nbsp;
+              td(id="vMaxKey" + row)
+              td(id="vMaxVal" + row) &nbsp;
               - row++
         table.maxmin
           tr
@@ -37,8 +37,8 @@ block content
           - var row = 0
           while (row < 10)
             tr
-              td(id="vMinKey#{row}")
-              td(id="vMinVal#{row}") &nbsp;
+              td(id="vMinKey" + row)
+              td(id="vMinVal" + row) &nbsp;
               - row++
         table.maxmin
           tr
@@ -59,7 +59,7 @@ block content
               - var col_cnt = 0
               while (col_cnt++ < cols)
                 if (cell_cnt++ < cells)
-                  td.cfs(id="va#{cell_cnt}", title="va#{cell_cnt}") #{cell_cnt} 
+                  td.cfs(id="va" + cell_cnt, title="va" + cell_cnt) #{cell_cnt} 
                 else
                   td
 

@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  .container
+    .row
+      .col
+        h2 BEMS ENV Sim #{smoke_machine_chk}
+        hr 
+    .row
+      .col 
+        table
+          each val, key in envTbl
+            tr
+              td #{key}
+              td
+                input.bigBox(type='checkbox' id=key name=key checked=val)
+
+  style.
+    input.bigBox {width: 25px;height: 25px;}
+    table { width: 570px;}
+    table tr td { font-size:27px; font-weight:bold;}
+
+  script.
+    $( document ).ready( () => {
+
+      data_xhr = get_sim_data
+      data_xhr()
+
+      let el = document.getElementById("sim")
+      if (el != null) el.classList.add("active")
+    })

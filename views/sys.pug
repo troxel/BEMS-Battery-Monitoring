@@ -15,13 +15,13 @@ block content
             th CPU%
             th Control
           each obj, key in cmdObj
-            tr(id="#{key}")
-              td(id="#{key}_lbl")= obj['lbl']
-              td(id="#{key}_pid")= obj['pid']
-              td(id="#{key}_mem")= obj['mem']
-              td(id="#{key}_cpu")= obj['cpu']
+            tr(id=key)
+              td(id=key + "_lbl")= obj['lbl']
+              td(id=key + "_pid")= obj['pid']
+              td(id=key + "_mem")= obj['mem']
+              td(id=key + "_cpu")= obj['cpu']
               td
-                button.procSubmit.btn.btn-primary.btn-sm(id="#{key}_btn", type="submit")  START
+                button.procSubmit.btn.btn-primary.btn-sm(id=key + "_btn" type="submit")  START
       .col
         h4 Top
         pre

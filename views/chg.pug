@@ -2,7 +2,6 @@ extends layout
 
 block content
 
-  input#str_id(type="hidden",value="#{str_id}")
   .container
     .row  
       .col-xs Charge Overview
@@ -37,7 +36,7 @@ block content
                     - var col_start = row_cnt * innerLoopStep + tbl_cnt * outerLoopStep
                     while (col_cnt < cols)
                       - cell_id = col_start + col_cnt + 1
-                      td(id="#{prefix}#{cell_id}", title="#{prefix}#{cell_id}") #{prefix}#{cell_id}
+                      td(id=prefix + cell_id, title=prefix + cell_id) #{prefix}#{cell_id}
                       - col_cnt++
                     - row_cnt++
               - tbl_cnt++

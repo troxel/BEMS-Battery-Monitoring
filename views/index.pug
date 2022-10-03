@@ -35,8 +35,8 @@ block content
           - var row = 0
           while (row < 10)
             tr
-              td(id="vMinKey#{row}")
-              td(id="vMinVal#{row}")
+              td(id="vMinKey" + row)
+              td(id="vMinVal" + row)
               - row++
 
         table.maxmin.table-bordered.caption-top()
@@ -47,8 +47,8 @@ block content
           - var row = 0
           while (row < 10)
             tr
-              td(id="tMaxKey#{row}")
-              td(id="tMaxVal#{row}") 
+              td(id="tMaxKey" + row)
+              td(id="tMaxVal" + row) 
               - row++
       .col
         table.table-bordered.w-100
@@ -62,7 +62,7 @@ block content
             thead
               tr(style="text-align:right;")
                 td() 
-                  button#clearFaults.btn.btn-outline-primary.text-small(type="button",style="height:30px;margin-top:7px;") Clear
+                  button#clearFaults.btn.btn-outline-primary.text-small(type="button" style="height:30px;margin-top:7px;") Clear
 
     section.row
       .col
@@ -94,7 +94,7 @@ block content
             td 
 
 
-  script 
+  script. 
     $( document ).ready( () => {
       getSetPoints()   
 

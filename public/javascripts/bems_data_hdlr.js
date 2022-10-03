@@ -26,6 +26,7 @@ function spinner(time) {
 
    if ( time ) {
       let diff = new Date() - new Date(time)
+
       if ( diff > timeThreshold ){
          timeFmt.classList.remove('bg-success')
          timeFmt.classList.add('bg-danger')
@@ -78,6 +79,8 @@ function get_str_data() {
                this.error(this.xhr,this.textStatus,data['error'])
                return
             }
+
+            spinner(data.time)
 
             // --- Dispaly Data ----
             var dh = dataHdlr()
@@ -171,6 +174,44 @@ function get_sys_data(action) {
             console.error('Ajax Error! ' + errorMessage);
          },
          timeout:30000,
+         dataType: 'json',        
+   });
+}
+
+// ----------------------------------------------------------
+// ------------------------- SIM --------------------------
+// ----------------------------------------------------------
+function get_sim_data(action) {
+
+   var url = `${url_srv}/sim/xhr`;
+
+   if ( typeof action != 'undefined') {
+      if ( 'id' in action) {
+         url += `?id=${action.id}&cmd=${action.cmd}`
+      }
+   }
+
+   var xhr = $.ajax({
+         url: url,
+         success: function(data){ 
+            if ( data['error'] ) {
+               this.error(this.xhr,this.textStatus,data['error'])
+               return
+            }
+           
+            // --- display by id ----
+            let dh = dataHdlr()
+            dh.process(data)
+         },
+         complete: function(){
+            // clear previous so don't stack'm up
+            //clearTimeout(timeoutId)
+            //timeoutId = setTimeout(get_sim_data,9000)
+         },
+         error: function (jqXhr, textStatus, errorMessage) {
+            console.error('Ajax Error! ' + errorMessage);
+         },
+         timeout:5000,
          dataType: 'json',        
    });
 }
@@ -395,7 +436,8 @@ function dataHdlr(hdlrObj) {
       }
    }
 
-   //---------------------------------   
+   //--------------------------------- 
+   // rtnObj['setAttribute']['time'] = {"style":"background-color: red"}
    this.setAttribute = function(data) {
        for (let id in data) {
 
@@ -406,7 +448,10 @@ function dataHdlr(hdlrObj) {
          const elid = document.getElementById(id)
          if ( elid != null ) {
             for (let attr in data[id]) {
-               elid.setAttribute(attr,data[id][attr])
+               let rtn = elid.setAttribute(attr,data[id][attr])
+
+               console.log(rtn,id,elid,attr,data[id][attr])
+
             }
          }
       }

@@ -88,6 +88,9 @@ router.get('/str/:str', async function(req, res, next) {
   vKeys.shift()
   vVals.shift()
   
+  time = rows[0][0]['time']  // spinner
+  innerHTML['timeFmt'] = new Date(rows[0][0]['time']).toLocaleString('en-US', {hour12: false})
+
   innerHTML['vSum'] = vVals.sum().toFixed(0)
   innerHTML['vAve'] = (innerHTML['vSum']/vVals.length).toFixed(1)
       
@@ -130,7 +133,7 @@ router.get('/str/:str', async function(req, res, next) {
     innerHTML["TmaxVal" + i] = tHash[tKeys[i]]
   }
   
-  res.json({innerHTML:innerHTML}) 
+  res.json({time:time,innerHTML:innerHTML}) 
 })
   
 // -----------------------------------------------------------

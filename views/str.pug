@@ -2,7 +2,7 @@ extends layout
 
 block content
 
-  input#str_id(type="hidden",value="#{str_id}")
+  input#str_id(type="hidden",value=str_id)
   .container
     .row  
       .col-xs String <span id="str_lbl">#{str_lbl}</span> Voltage <span id="vSum"></span> Voltage Ave <span id="vAve"></span>
@@ -19,9 +19,9 @@ block content
           - var row = 0
           while (row < 10)
             tr
-              td(id="VmaxTray#{row}")
+              td(id="VmaxTray" + row)
               td 
-                span(id="VmaxVal#{row}") 
+                span(id="VmaxVal" + row) 
                 span  v
               - row++
         table.maxmin
@@ -39,9 +39,9 @@ block content
           - var row = 0
           while (row < 10)
             tr
-              td(id="VminTray#{row}")
+              td(id="VminTray" + row )
               td
-                span(id="VminVal#{row}") 
+                span(id="VminVal" + row) 
                 span  v
               - row++
         table.maxmin
@@ -62,10 +62,11 @@ block content
               - var col_cnt = 0
               while (col_cnt < cols)
                 - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="v#{cell_cnt}", title="v#{cell_cnt}") &nbsp;
+                td.cfs(id="v" +cell_cnt, title="v" + cell_cnt) &nbsp;
                 - col_cnt++
               - offset_cell = offset_cell + cols
               - row_cnt++
+
         include includes/spVolts.jade
     .row(style="margin-top:10px; background-color: #d0d4c0;")
       .col-3
@@ -77,9 +78,9 @@ block content
           - var row = 0
           while (row < 10)
             tr
-              td(id="TmaxTray#{row}")
+              td(id="TmaxTray" + row)
               td 
-                span(id="TmaxVal#{row}") 
+                span(id="TmaxVal" + row) 
                 span  °F
               - row++
         table.maxmin
@@ -101,7 +102,7 @@ block content
               - var col_cnt = 0
               while (col_cnt < cols)
                 - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="t#{cell_cnt}") &nbsp;
+                td.cfs(id="t" + cell_cnt) &nbsp;
                 - col_cnt++
               - offset_cell = offset_cell + cols
               - row_cnt++
@@ -120,7 +121,7 @@ block content
               while (j < cols)
                 - cnt = j + k
                 - j++
-                td.cfs(id="b#{cnt}") v#{cnt}
+                td.cfs(id="b" + cnt) "v" + cnt
               - k = k + j
 
   script.
