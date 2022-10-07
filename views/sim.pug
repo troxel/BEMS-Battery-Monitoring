@@ -1,24 +1,59 @@
 extends layout
 
 block content
-  .container
-    .row
-      .col
-        h2 BEMS ENV Sim #{smoke_machine_chk}
-        hr 
-    .row
-      .col 
-        table
-          each val, key in envTbl
-            tr
-              td #{key}
-              td
-                input.bigBox(type='checkbox' id=key name=key checked=val)
+  form(action="/sim/submit_env" method="POST")
+    .container
+      .row
+        .col
+          h2 BEMS Sim #{smoke_machine_chk}
+           
+    .container.border(style="margin:7px;")
+      .row
+        h4 Error Word 7 
+        .col-1 
+        .col-4 
+          table
+            each lbl in errWd7
+              tr
+                td.lbl #{lbl}
+                td
+                  input.bigBox(type='checkbox' id=lbl name=lbl checked=checked[lbl]) 
+
+      .row
+        h4(style="margin-top:7px;") Error Word 8 
+        .col-1 
+        .col-4 
+          table
+            each lbl in errWd8
+              tr
+                td.lbl #{lbl}
+                td
+                  input.bigBox(type='checkbox' id=lbl name=lbl checked=checked[lbl])
+      .row
+        .col.text-center 
+          button.btn.btn-success(type="submit" style="margin:15px;") Submit Env Overrides
+
+  form(action="/sim/submit_aux" method="POST")
+    .container.border(style="margin:7px;")
+      .row
+        h3 Error Word 5 
+        .col-1
+        .col 
+          table  
+            each lbl in errWd5
+              tr
+                td.lbl #{lbl}
+                td
+                  input.bigBox(type='checkbox' id=lbl name=lbl checked=checked[lbl])
+      .row
+        .col.text-center 
+          button.btn.btn-success(type="submit" style="margin:15px;") Submit Aux Overrides
+          
 
   style.
     input.bigBox {width: 25px;height: 25px;}
     table { width: 570px;}
-    table tr td { font-size:27px; font-weight:bold;}
+    table tr td.lbl { font-size:21px; font-weight:bold; width:90%;}
 
   script.
     $( document ).ready( () => {
