@@ -106,3 +106,6 @@ dist
 *.sql
 *.not
 *.exe
+
+./test/bems_aux.json
+./test/bems_env.json

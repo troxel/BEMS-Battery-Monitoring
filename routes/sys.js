@@ -1,6 +1,7 @@
 var express = require('express');
 const { resolve } = require('path');
 var router = express.Router();
+const request = require('request');
 
 var date = new Date();
 
@@ -12,40 +13,60 @@ cmdObj['/opt/bems_aux/bin/bems_env']   = {lbl:'Bems Env',id:'bems_env'}
  */
 
 var cmdObj = {}
-cmdObj['bems_main']  = {lbl:'Bems Main',cmd:'bems_main.exe'}
-cmdObj['bems_gui']   = {lbl:'Bems Gui',cmd:'/bin/node /opt/bems/bems_gui/bin/www'}
-cmdObj['bems_aux']  = {lbl:'Bems Aux',cmd:'bems_aux.exe'}
-cmdObj['bems_env']  = {lbl:'Bems Env',cmd:'bems_env.exe'}
-cmdObj['sbs_dcm']  = {lbl:'Bems SBS',cmd:'sbs_dcm.py'}
+cmdObj['bems_main']  = {lbl:'Bems_Main',cmd:'bems_main.exe'}
+cmdObj['bems_gui']   = {lbl:'Bems_Gui',cmd:'/bin/node /opt/bems/bems_gui/bin/www'}
+cmdObj['bems_aux']  = {lbl:'Bems_Aux',cmd:'bems_aux.exe'}
+cmdObj['bems_env']  = {lbl:'Bems_Env',cmd:'bems_env.exe'}
+cmdObj['sbs_dcm']  = {lbl:'Bems_SBS',cmd:'sbs_dcm.py'}
+
+// Get DCM hosts names from env which are set in the unit file
+let dcm = {}
+dcm.envHost = process.env.dcmEnvHost
+dcm.auxHost = process.env.dcmAuxHost
 
 // -----------------------------------------------------------
 //  GET System Data Paint Page
 // -----------------------------------------------------------
 router.get('/', function(req, res, next) {
 
-    res.render('sys',{cmdObj:cmdObj})
+    res.render('sys',{cmdObj:cmdObj,envHost:dcm.envHost,auxHost:dcm.auxHost})
 })
 
 // -----------------------------------------------------------
 //  XHR GET System Data 
 // -----------------------------------------------------------
 const execSync = require('child_process').execSync;
+const ping = require('ping');
 
-/* var cmdObj = {}
-cmdObj['bems_main']  = {lbl:'Bems Main',cmd:'bems_main.exe'}
-cmdObj['bems_gui']   = {lbl:'Bems Gui',cmd:'/bin/node /opt/bems/bin/www'}
-cmdObj['bems_aux']  = {lbl:'Bems Aux',cmd:'bems_aux.exe'}
-cmdObj['bems_env']  = {lbl:'Bems Env',cmd:'bems_env.exe'}
-cmdObj['sbs_dcm']  = {lbl:'Bems SBS',cmd:'sbs_dcm.py'}
- */
 router.get('/xhr', async function(req, res, next) {
 
   let rtnObj = {}
   rtnObj['innerHTML'] = {}
   rtnObj['classList'] = {}
 
+  // ---- commands -------------------
   if ( req.query.id ) {
-   console.log(req.query.id,req.query.cmd)
+    console.log('cmd -> ',req.query.id,req.query.cmd)
+
+    if ( req.query.id === 'halt_env' ) {
+
+      request('http://' + dcm.envHost + '/halt', function (error, response, body) {
+        if (error) { console.error(`Error halting ${dcm.envHost} `, error) }
+        else { 
+          console.log(`Halt ${dcm.envHost} statusCode: `, response && response.statusCode); // Print the response status code if a response was received
+        }
+      })
+    } 
+
+    if ( req.query.id === 'halt_aux' ) {
+
+      request('http://' + dcm.auxHost + '/halt', function (error, response, body) {
+        if (error) { console.error(`Error halting ${dcm.auxHost} `, error) }
+        else { 
+          console.log(`Halt ${dcm.auxHost} statusCode: `, response && response.statusCode); // Print the response status code if a response was received
+        }
+      })
+    } 
   }
 
   for (const key in cmdObj) {
@@ -56,7 +77,12 @@ router.get('/xhr', async function(req, res, next) {
     rtnObj['classList'][key] = {add:'text-danger'}
   }
 
-  
+  // --- Ping DCMs -----------
+  for (const key in dcm) {
+    let response = await ping.promise.probe(dcm[key])
+    rtnObj['innerHTML'][key] = response.alive ? 'UP' : 'DOWN'
+  }
+ 
   try {
     var stdout = execSync("journalctl --unit=bems_gui -n 10 -r --no-pager",{timeout:2000,encoding:'utf8'})
     let logLst = stdout.split("\n")

@@ -5,9 +5,8 @@ block content
     .row
       .col-4
 
-        h4 Sys 
-
-        table.table-bordered
+        h5 BEMS Processes
+        table.table-bordered(style="margin-bottom:20px;width:100%;")
           tr
             th Cmd
             th PID 
@@ -17,11 +16,28 @@ block content
           each obj, key in cmdObj
             tr(id=key)
               td(id=key + "_lbl")= obj['lbl']
-              td(id=key + "_pid")= obj['pid']
-              td(id=key + "_mem")= obj['mem']
-              td(id=key + "_cpu")= obj['cpu']
-              td
-                button.procSubmit.btn.btn-primary.btn-sm(id=key + "_btn" type="submit")  START
+              td.text-center(id=key + "_pid")= obj['pid']
+              td.text-center(id=key + "_mem")= obj['mem']
+              td.text-center(id=key + "_cpu")= obj['cpu']
+              td.text-center
+                button.procSubmit.btn.btn-primary.btn-sm(id=key + "_btn" type="submit")  START 
+
+        h5 Halt DCM 
+        table.table-bordered(style="width:100%;")
+          tr
+            th DCM
+            th Status
+            th Halt
+          tr
+            td ENV #{envHost}
+            td#envHost.text-center
+            td.text-center
+              button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="halt_env") Halt
+          tr
+            td AUX #{auxHost}
+            td#auxHost.text-center
+            td.text-center 
+              button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="halt_aux") Halt
       .col
         h4 Top
         pre
@@ -38,7 +54,9 @@ block content
         h4 Log
         pre
           #logBr
-
+  
+  style.
+    
 
   script.
     $( document ).ready( () => {

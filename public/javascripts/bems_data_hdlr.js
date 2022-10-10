@@ -682,9 +682,6 @@ $( document ).ready( () => {
    })
 
 
-
-
-
 }) // Form Handler 
 
 

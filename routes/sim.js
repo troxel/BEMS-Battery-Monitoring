@@ -37,7 +37,6 @@ let renderSimPage = function(req, res, next) {
   'String_High_Temperature_Aux_Alarm','String_High_Temperature_Aux_Fault','Cell_Low_Voltage_Aux_Alarm',
   'Cell_Low_Voltage_Aux_Fault']
  
-
   res.render('sim',rtnObj)
 }
 
