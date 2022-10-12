@@ -13,7 +13,7 @@ var auxRouter   = require('./routes/aux');
 var envRouter   = require('./routes/env');
 var simRouter   = require('./routes/sim');
 var chgRouter   = require('./routes/chg');
-var xhrRouter   = require('./routes/xhr');
+//var xhrRouter   = require('./routes/xhr');
 var sysRouter   = require('./routes/sys');
 
 var app = express();
@@ -52,7 +52,7 @@ app.use('/env', envRouter);
 app.use('/sim', simRouter);
 app.use('/sys', sysRouter);
 app.use('/chg', chgRouter);
-app.use('/xhr', xhrRouter);
+//app.use('/xhr', xhrRouter);
 
 //console.dir(xhrRouter, { depth: null })
 

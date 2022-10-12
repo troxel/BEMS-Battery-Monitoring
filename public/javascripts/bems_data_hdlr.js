@@ -69,7 +69,7 @@ function get_str_data() {
          return
    }
 
-   const url = `${url_srv}/xhr/str/${str_lbl}`;
+   const url = `${url_srv}/str/xhr/${str_lbl}`;
    
    var xhr = $.ajax({
          url: url,
@@ -680,6 +680,7 @@ $( document ).ready( () => {
       get_sys_data({id:event.target.id,cmd:event.target.innerHTML})
 
    })
+
 
 
 }) // Form Handler 

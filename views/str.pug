@@ -66,7 +66,6 @@ block content
                 - col_cnt++
               - offset_cell = offset_cell + cols
               - row_cnt++
-
         include includes/spVolts.jade
     .row(style="margin-top:10px; background-color: #d0d4c0;")
       .col-3
@@ -88,7 +87,6 @@ block content
             td High Temp Trays
             td#numHighTemp 
             td
-
       .col-2
       .col-4
         table(class="table-bordered caption-top", style="width:400px")
@@ -107,22 +105,78 @@ block content
               - offset_cell = offset_cell + cols
               - row_cnt++
         include includes/spTemp.jade
-    .row
-      .col
-      .col
-      .col
-        table(class="table-bordered", style="width:400px")
-          - var k = 1
-          - var rows = start_cell + 7
-          - var cols = 10
-          while (start_cell++ < rows)
+    .row(style="margin-top:10px; background-color: #d0d4c0;")
+      .col-3
+        table.maxmin.table-bordered.caption-top()
+          caption Minumum 
+          th Balance
+          th %
+          - var row = 0
+          while (row < 10)
             tr
-              - var j = 0
-              while (j < cols)
-                - cnt = j + k
-                - j++
-                td.cfs(id="b" + cnt) "v" + cnt
-              - k = k + j
+              td(id="BmaxTray" + row)
+              td 
+                span(id="BmaxVal" + row) 
+                span  °F
+              - row++
+        table.maxmin
+          tr
+            td Minimum Balance Trays
+            td#numLoBalance 
+            td
+      .col-2
+      .col-4
+        table(class="table-bordered caption-top", style="width:400px")
+          caption Tray Balance Percent
+          - var offset_cell = str_id * 70 + 1 
+          - var rows = 7
+          - var cols = 10
+          - var row_cnt = 0
+          while (row_cnt < rows)
+            tr
+              - var col_cnt = 0
+              while (col_cnt < cols)
+                - cell_cnt = offset_cell + col_cnt
+                td.cfs(id="b" + cell_cnt) &nbsp;
+                - col_cnt++
+              - offset_cell = offset_cell + cols
+              - row_cnt++
+    .row(style="margin-top:10px; background-color: #d0d4c0;")
+      .col-3
+        table.maxmin.table-bordered.caption-top()
+          caption Maximum 
+          th Impedance
+          th mOhm
+          - var row = 0
+          while (row < 10)
+            tr
+              td(id="RmaxTray" + row)
+              td 
+                span(id="RmaxVal" + row) 
+                span  &nbsp;
+              - row++
+        table.maxmin
+          tr
+            td Maximum Impedance Trays
+            td#numHighImpedance 
+            td
+      .col-2
+      .col-4
+        table(class="table-bordered caption-top", style="width:400px")
+          caption Tray Impedance mOhm
+          - var offset_cell = str_id * 70 + 1 
+          - var rows = 7
+          - var cols = 10
+          - var row_cnt = 0
+          while (row_cnt < rows)
+            tr
+              - var col_cnt = 0
+              while (col_cnt < cols)
+                - cell_cnt = offset_cell + col_cnt
+                td.cfs(id="r" + cell_cnt) &nbsp;
+                - col_cnt++
+              - offset_cell = offset_cell + cols
+              - row_cnt++
 
   script.
     $( document ).ready( () => {

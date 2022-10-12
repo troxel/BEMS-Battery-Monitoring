@@ -20,7 +20,14 @@ block content
         each num in chgNum
           table.chg-tbl
             tr
-              td(style="text-align:center;") #{num}
+              td.fw-bold.text-center(rowspan="4") C<br>H<br>G<br>#{num}
+              td.text-end(id="Chg"+num+"Str1") #{num}
+            tr
+              td.text-end(id="Chg"+num+"Str2") #{num}
+            tr
+              td.text-end(id="Chg"+num+"Str3") #{num}
+            tr
+              td.text-end(id="Chg"+num+"Str4") #{num}
       each item in tblContent
         .col.gx-2
             - var cap = item['caption']

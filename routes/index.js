@@ -5,17 +5,19 @@ const db = require('../services/mysqldb');
 const config = require('../config');
 const util = require('../services/cmn-util')
 
+const _ = require('lodash');
+
 var date = new Date();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   
-  res.render('index', { title: 'EMS' });
+  res.render('index', { title: 'BEMS' });
 
 });
 
 // -----------------------------------------------------------
-// HOME Page
+// HOME (index() XHR data
 // -----------------------------------------------------------
 router.get('/xhr', async function(req, res, next) {
 
@@ -48,7 +50,7 @@ router.get('/xhr', async function(req, res, next) {
   
   // Calculate string series voltage
   for (let i=0;i<4;i++){
-    htmlObj['vSumStr'+i] = (vVals.splice(0,69).sum().toFixed(0))
+    htmlObj['vSumStr'+i] = _.sum(vVals.splice(0,69)).toFixed(0)
   }
 
   htmlObj['vminmax'] = util.maxmin(vHash,'v')
@@ -60,7 +62,8 @@ router.get('/xhr', async function(req, res, next) {
   tHash = rows[1][0]
   delete tHash['time']
 
-  htmlObj['tAve'] = (tVals.sum()/tVals.length).toFixed(1)
+  // Note tAve is not used in the template... 
+  htmlObj['tAve'] = (_.sum(tVals)/tVals.length).toFixed(1)
 
   htmlObj['tminmax'] = util.maxmin(vHash,'t')
 
@@ -88,6 +91,13 @@ router.get('/xhr', async function(req, res, next) {
  
   res.json(rtn) 
 })
+
+// handy dandy array sum function
+// Using lodash now.
+//Array.prototype.sum = function() {
+//   return this.reduce(function(a,b){return a+b;});
+//};
+
 
 module.exports = router;
 
