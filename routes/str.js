@@ -5,6 +5,7 @@ const db = require('../services/mysqldb');
 const config = require('../config');
 
 const _ = require('lodash');
+const util = require('../services/cmn-util')
 
 var date = new Date();
 
@@ -14,7 +15,6 @@ router.get('/:str', function(req, res, next) {
   let strHsh = {}
   strHsh['str_lbl'] = req.params.str
   strHsh['str_id']  = req.params.str - 1
-  console.log("str ",strHsh)
   res.render('str', strHsh);
 
 });
@@ -57,6 +57,8 @@ str_select['balance'][3] = "b211,b212,b213,b214,b215,b216,b217,b218,b219,b220,b2
 /* GET str page. */ 
 router.get('/xhr/:str', async function(req, res, next) {
 
+  //console.log('cookies ',req.cookies)
+
   // Never should happen but... 
   let str_id = req.params.str - 1
 
@@ -81,56 +83,45 @@ router.get('/xhr/:str', async function(req, res, next) {
   innerHTML['timeFmt'] = new Date(rows[0][0]['time']).toLocaleString('en-US', {hour12: false})
   innerHTML['timeFmtR'] = new Date(rows[2][0]['time']).toLocaleString('en-US', {hour12: false})
 
-  // Voltage stats
-  vKeys = Object.keys(rows[0][0])
-  vVals = Object.values(rows[0][0])
-  vHash = rows[0][0]
-  vKeys.shift()
-  vVals.shift()
-  
-  innerHTML['vSum'] = _.sum(vVals).toFixed(0)
-  innerHTML['vAve'] = (innerHTML['vSum']/vVals.length).toFixed(1)
-      
-  vKeys.sort((a,b)=>{return vHash[a]-vHash[b]})
+  let style = {}
+  // --------------------------------------
+  // Voltage 
+  // --------------------------------------
+  let spHighVolt = req.cookies.spHighVolt
+  let spLowVolt  = req.cookies.spLowVolt
 
-  // Max/Min voltage
-  const reTray = /(\d+)$/
-  
-  for (let i = 0;i<10;i++){
+  var [a,b] = util.tblProc('v',rows[0][0],spHighVolt,spLowVolt)
+  innerHTML['volt'] = a
+  style['volt'] = b
 
-    let tray = reTray.exec(vKeys[i])[0]
+ // [innerHTML['volt'],style['volt']] = util.tblProc('v',rows[0][0],spHighVolt,spLowVolt)
 
-    innerHTML["VminTray" + i] = tray
-    innerHTML["VminVal" + i] = vHash[vKeys[i]]
 
-    let offset = (vKeys.length-10) - i; 
-    tray = reTray.exec(vKeys[offset])[0]
+  // ---- Temperature stats -------------------
+  let spHighTemp = req.cookies.spHighTemp
+  let spLowTemp  = req.cookies.spLowTemp
 
-    innerHTML["VmaxTray" + i] = tray
-    innerHTML["VmaxVal" + i] = vHash[vKeys[offset]]
-  }
+  var [a,b] = util.tblProc('t',rows[1][0],spHighTemp,spLowTemp)
+  innerHTML['temp'] = a
+  style['temp'] = b
 
-  // Temperature stats
-  let tKeys = Object.keys(rows[1][0])
-  let tVals = Object.values(rows[1][0])
-  let tHash = rows[1][0]
-  tKeys.shift()
-  tVals.shift()
+  // // ---- Impedance stats ------------------
+  let spHighImpedance = req.cookies.spHighImpedance
+  let spLowImpedance  = req.cookies.spLowImpedance
 
-  innerHTML['tAve'] = (_.sum(tVals)/tVals.length).toFixed(1)
-      
-  // Descending sort
-  tKeys.sort((a,b)=>{return tHash[b]-tHash[a]})
+  var [a,b] = util.tblProc('r',rows[2][0],spHighImpedance,spLowImpedance)
+  innerHTML['impedance'] = a
+  style['impedance'] = b
 
-  // Max Temperature data
-  for (let i = 0;i<10;i++){
-    let tray = reTray.exec(tKeys[i])[0]
+  // ---- Balance stats ------------------
+  let spHighBalance = req.cookies.spHighBalance
+  let spLowBalance  = req.cookies.spLowBalance
 
-    innerHTML["TmaxTray" + i] = tray
-    innerHTML["TmaxVal" + i] = tHash[tKeys[i]]
-  }
-  
-  res.json({time:time,innerHTML:innerHTML}) 
+  var [a,b] = util.tblProc('b',rows[3][0],spHighBalance,spLowBalance)
+  innerHTML['balance'] = a
+  style['balance'] = b
+
+  res.json({time:time,innerHTML:innerHTML,style:style}) 
 })
 
 module.exports = router;

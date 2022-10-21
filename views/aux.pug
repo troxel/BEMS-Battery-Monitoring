@@ -18,14 +18,14 @@ block content
 
           - var row = 0
           while (row < 10)
-            tr
-              td(id="vMaxKey" + row)
-              td(id="vMaxVal" + row) &nbsp;
+            tr(id="vaMaxRow" + row)
+              td(id="vaMaxKey" + row)
+              td(id="vaMaxVal" + row) &nbsp;
               - row++
-        table.maxmin
+        table.maxminnum
           tr
-            td High Voltage Trays
-            td#numHighVolt 
+            td High Volt Cells
+            td#vaNumHigh
             td 
 
       .col-3
@@ -36,14 +36,14 @@ block content
 
           - var row = 0
           while (row < 10)
-            tr
-              td(id="vMinKey" + row)
-              td(id="vMinVal" + row) &nbsp;
+            tr(id="vaMinRow" + row)
+              td(id="vaMinKey" + row)
+              td(id="vaMinVal" + row) &nbsp;
               - row++
-        table.maxmin
+        table.maxminnum
           tr
-            td Low Voltage Trays
-            td#numLowVolt 
+            td Low Voltage Cells
+            td#vaNumLow 
             td
 
       .col-7
@@ -62,13 +62,7 @@ block content
                   td.cfs(id="va" + cell_cnt, title="va" + cell_cnt) #{cell_cnt} 
                 else
                   td
-
-        .form-group(style="margin-top:4px; margin-bottom:3px;")
-          //- button.spSubmit.btn.btn-primary.btn-sm(type="submit") Set
-          label() Voltage Setpoints High
-          input#spHighVolt.spVal(size="2")
-          label() Low
-          input#spLowVolt.spVal(size="2")
+        include includes/spVoltsAux.pug
 
     .row(style="margin-top:10px; background-color: #d0d4c0;")
       

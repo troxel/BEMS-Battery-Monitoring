@@ -22,7 +22,7 @@ var randomValues = {
 		return( ( 200 + (Math.random() * 30)).toFixed(2) )
 	},
 	va: function(){
-		return( ( 11 + (Math.random() * 3)).toFixed(2) )
+		return( ( 1.5 + (Math.random() * 1.7)).toFixed(2) )
 	},
 	temperature_aux: function(){
 		return( ( 68 + (Math.random() * 14)).toFixed(2) )
@@ -63,7 +63,9 @@ function insert_tray_rows(){
 		let tLst = []
 
 		for (let i = 1; i <= 280; i++) {
-			tLst.push( randomValues[j]() )
+			let val = randomValues[j]()
+			if ( Math.random() > 0.9 ) { val = 'NULL'}  // Text missing vals
+			tLst.push( val )
 		}
 
 		valStr = tLst.join(',')

@@ -21,8 +21,6 @@ nav {
    color: #6c757d;
    text-align: left;}
 
-.traytbl { }
-
 .chg-tbl {
    border-collapse: collapse;
    width:100%;
@@ -34,10 +32,15 @@ nav {
    border: 0.5px dotted black;
    font-size:.9em;
 }
- 
 
 .maxmin {  width: 157px;}
+.maxmin th { text-align:center; }
 .maxmin td { font-size: 12px; text-align:right; padding-right:7px; height:13x;}
-.maxmin caption { font-size: 14px; padding:0px; }
+.maxmin caption { font-size: 14px; padding:0px; font-weight: bold;}
+
+.traytbl caption { font-size: 16px; font-weight: bold; }
+
+.maxminnum td { font-size: .9em; }
+
 
 .spVal {height:21px; ;}

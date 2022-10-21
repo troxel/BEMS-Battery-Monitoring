@@ -9,49 +9,45 @@ block content
       hr
   .container
 
-    .row.border(style="background-color: #d0d4c0;")
+    .row.border.border-primary(style="background-color: #d0d4c0;")
       .col-2
-        table.maxmin(class="table-bordered caption-top")
-          caption= "Maximum Voltages"
+        table.maxminVolt.maxmin(class="table-bordered caption-top")
+          caption Max Voltages
           th Tray 
           th Volts
 
           - var row = 0
           while (row < 10)
-            tr
-              td(id="VmaxTray" + row)
-              td 
-                span(id="VmaxVal" + row) 
-                span  v
+            tr(id="vMaxRow" + row)
+              td(id="vMaxKey" + row)
+              td(id="vMaxVal" + row) 
               - row++
-        table.maxmin
+        table.maxminnum
           tr
-            td High Voltage Trays
-            td#numHighVolt 
+            td High Volt Trays
+            td#vNumHigh 
             td 
 
       .col-3
-        table.maxmin.table-bordered.caption-top()
-          caption= "Minimum Voltages"
+        table.maxminVolt.maxmin.table-bordered.caption-top()
+          caption Min Voltages
           th Tray 
           th Volts
 
           - var row = 0
           while (row < 10)
-            tr
-              td(id="VminTray" + row )
-              td
-                span(id="VminVal" + row) 
-                span  v
+            tr(id="vMinRow" + row)
+              td(id="vMinKey" + row )
+              td(id="vMinVal" + row)
               - row++
-        table.maxmin
+        table.maxminnum
           tr
-            td Low Voltage Trays
-            td#numLowVolt 
+            td Low Volt Trays
+            td#vNumLow 
             td
 
       .col-7
-        table(class="table-bordered caption-top traytbl", style="width:400px")
+        table#volt(class="table-bordered caption-top traytbl", style="width:400px")
           caption Tray Voltages
           - var offset_cell = str_id * 70 + 1 
           - var rows = 7
@@ -66,30 +62,28 @@ block content
                 - col_cnt++
               - offset_cell = offset_cell + cols
               - row_cnt++
-        include includes/spVolts.jade
+        include includes/spVolts.pug
     .row(style="margin-top:10px; background-color: #d0d4c0;")
       .col-3
         table.maxmin.table-bordered.caption-top()
-          caption Maximum Temperature
+          caption Max Temperature
           th Tray 
           th °F
 
           - var row = 0
           while (row < 10)
-            tr
-              td(id="TmaxTray" + row)
-              td 
-                span(id="TmaxVal" + row) 
-                span  °F
+            tr(id="tMaxRow" + row)
+              td(id="tMaxKey" + row)
+              td(id="tMaxVal" + row) 
               - row++
-        table.maxmin
+        table.maxminnum
           tr
             td High Temp Trays
-            td#numHighTemp 
+            td#tNumHigh 
             td
       .col-2
       .col-4
-        table(class="table-bordered caption-top", style="width:400px")
+        table(class="table-bordered caption-top traytbl", style="width:400px")
           caption Tray Temperatures °F
           - var offset_cell = str_id * 70 + 1 
           - var rows = 7
@@ -104,29 +98,27 @@ block content
                 - col_cnt++
               - offset_cell = offset_cell + cols
               - row_cnt++
-        include includes/spTemp.jade
+        include includes/spTemp.pug
     .row(style="margin-top:10px; background-color: #d0d4c0;")
       .col-3
         table.maxmin.table-bordered.caption-top()
-          caption Minumum 
-          th Balance
+          caption Max Balance 
+          th Tray
           th %
           - var row = 0
           while (row < 10)
-            tr
-              td(id="BmaxTray" + row)
-              td 
-                span(id="BmaxVal" + row) 
-                span  °F
+            tr(id="bMaxRow" + row)
+              td(id="bMaxKey" + row)
+              td(id="bMaxVal" + row) 
               - row++
-        table.maxmin
+        table.maxminnum
           tr
-            td Minimum Balance Trays
-            td#numLoBalance 
+            td High Balance Trays
+            td#bNumHigh 
             td
       .col-2
       .col-4
-        table(class="table-bordered caption-top", style="width:400px")
+        table(class="table-bordered caption-top traytbl", style="width:400px")
           caption Tray Balance Percent
           - var offset_cell = str_id * 70 + 1 
           - var rows = 7
@@ -141,28 +133,28 @@ block content
                 - col_cnt++
               - offset_cell = offset_cell + cols
               - row_cnt++
+        include includes/spBalance.pug
+
     .row(style="margin-top:10px; background-color: #d0d4c0;")
       .col-3
-        table.maxmin.table-bordered.caption-top()
-          caption Maximum 
-          th Impedance
+        table.maxmin.table-bordered.caption-top.traytbl()
+          caption Max Impedance
+          th Tray
           th mOhm
           - var row = 0
           while (row < 10)
-            tr
-              td(id="RmaxTray" + row)
-              td 
-                span(id="RmaxVal" + row) 
-                span  &nbsp;
+            tr(id="rMaxRow" + row)
+              td(id="rMaxKey" + row)
+              td(id="rMaxVal" + row) 
               - row++
-        table.maxmin
+        table.maxminnum
           tr
-            td Maximum Impedance Trays
-            td#numHighImpedance 
-            td
+            td High Impedance Trays
+            td#rNumHigh 
+          
       .col-2
       .col-4
-        table(class="table-bordered caption-top", style="width:400px")
+        table(class="table-bordered caption-top traytbl", style="width:400px")
           caption Tray Impedance mOhm
           - var offset_cell = str_id * 70 + 1 
           - var rows = 7
@@ -177,6 +169,7 @@ block content
                 - col_cnt++
               - offset_cell = offset_cell + cols
               - row_cnt++
+        include includes/spImpedance.pug
 
   script.
     $( document ).ready( () => {

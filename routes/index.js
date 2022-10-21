@@ -41,7 +41,6 @@ router.get('/xhr', async function(req, res, next) {
   rtn['time'] = rows[0][0]['time']  // spinner
   htmlObj['timeFmt'] = new Date(rows[0][0]['time']).toLocaleString('en-US', {hour12: false})
 
-
   delete rows[0][0]['time']
 
   let vKeys = Object.keys(rows[0][0])
@@ -53,8 +52,9 @@ router.get('/xhr', async function(req, res, next) {
     htmlObj['vSumStr'+i] = _.sum(vVals.splice(0,69)).toFixed(0)
   }
 
+  // Populate max/min tables
   htmlObj['vminmax'] = util.maxmin(vHash,'v')
-  
+
   // Temperature stats
   Tstat = {} 
   tKeys = Object.keys(rows[1][0])
