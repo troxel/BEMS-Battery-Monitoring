@@ -127,12 +127,21 @@ block content
             name: sen,
             mode: 'lines+markers',
             type: 'scatter',
-            rangemode: 'tozero',
-            ticks: 'outside',
           })
         }
+        
+        var layout = {
+          showlegend: true,
+          xaxis: {
+            autorange: true
+          },
+          yaxis: {
+            rangemode: 'tozero',
+            autorange: true
+          }
+        }  
 
-        Plotly.newPlot('plot', traceLst);
+        Plotly.newPlot('plot', traceLst, layout);
       }              
 
     })
