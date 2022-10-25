@@ -34,7 +34,7 @@ block content
           th Volts
           - var row = 0
           while (row < 10)
-            tr
+            tr(id="vMinRow" + row)
               td(id="vMinKey" + row)
               td(id="vMinVal" + row)
               - row++
@@ -46,7 +46,7 @@ block content
 
           - var row = 0
           while (row < 10)
-            tr
+            tr(id="tMaxRow" + row)
               td(id="tMaxKey" + row)
               td(id="tMaxVal" + row) 
               - row++
@@ -78,19 +78,9 @@ block content
             td 
               input#spLowVolt.spVal(size="2")
           tr
-            th Impedance
-            td 
-              input#spHighTempsVolt.spVal(size="2")
-            td 
-          tr
             th Temperature
             td 
-              input#spHighTempsVolt.spVal(size="2")
-            td 
-          tr
-            th Current
-            td 
-              input#spHighCurr.spVal(size="2")
+              input#spHighTemp.spVal(size="2")
             td 
 
 

@@ -9,21 +9,6 @@ const util = require('../services/cmn-util')
 
 var date = new Date();
 
-/* GET home page. */ 
-router.get('/:str', function(req, res, next) {
-
-  let strHsh = {}
-  strHsh['str_lbl'] = req.params.str
-  strHsh['str_id']  = req.params.str - 1
-  res.render('str', strHsh);
-
-});
-
-/* XHR response */
-
-// Fault and alarm to ID relation
-var flt_alm_msg = { 1:'Voltage High!',2:'Voltage Sorta High!',3:'Smoke Detected!',4:'Fire Detected!',5:'Current over threshold' }
-
 // ---- Hard code requested columns for efficiency
 // Benchmarking show about a 50% increase in speed requesting a slice from a row in the DB vs all (*)
 var str_select = {}
@@ -53,75 +38,54 @@ str_select['balance'][2] = "b141,b142,b143,b144,b145,b146,b147,b148,b149,b150,b1
 str_select['balance'][3] = "b211,b212,b213,b214,b215,b216,b217,b218,b219,b220,b221,b222,b223,b224,b225,b226,b227,b228,b229,b230,b231,b232,b233,b234,b235,b236,b237,b238,b239,b240,b241,b242,b243,b244,b245,b246,b247,b248,b249,b250,b251,b252,b253,b254,b255,b256,b257,b258,b259,b260,b261,b262,b263,b264,b265,b266,b267,b268,b269,b270,b271,b272,b273,b274,b275,b276,b277,b278,b279,b280"
 // --------------------------------------------------------
 
+/* GET home page. */ 
 // -----------------------------------------------------------
-/* XHR str page. */ 
-router.get('/xhr/:str', async function(req, res, next) {
+router.get('/', function(req, res, next) {
 
-  //console.log('cookies ',req.cookies)
+  var selectVolts = []
+  for (j=0;j<280;j++) {
+    selectVolts.push({id:'v'+j,name:'v'+j})
+  }
 
-  // Never should happen but... 
-  let str_id = req.params.str - 1
+  selTblLst = [{lbl:'Prop Volts',id:'volts'},{lbl:'Prop Temperature',id:'temperature'},{lbl:'Prop Balance',id:'balance'},
+            {lbl:'Prop Impedance',id:'impedance'},{lbl:'String Current',id:'i_prop_str'},
+            {lbl:'Aux Volts',id:'volts_aux'},{lbl:'Aux Current',id:'i_aux'},{lbl:'Aux Temp',id:'temperature_aux'}]
 
-  if ( ! ( str_id >= 0 && str_id <= 3 ) ) {
-    console.error(str_id)
-    res.json({error: `str_id ${str_id} is outside acceptible range`}) 
-  }  
 
-  // Get string data for this str_id
-  const sql = `select time,${str_select['volts'][str_id]} from volts order by time desc limit 1;\
-  select time,${str_select['temperature'][str_id]} from temperature order by time desc limit 1;\
-  select time,${str_select['impedance'][str_id]} from impedance order by time desc limit 1;\
-  select time,${str_select['balance'][str_id]} from balance order by time desc limit 1;`;
+  res.render('tnd', {selTblLst:selTblLst});
+
+});
+
+// -----------------------------------------------------------
+// -----------------------------------------------------------
+/* GET str page. */ 
+router.get('/xhr', async function(req, res, next) {
+
+  let tbl    = req.query.tbl
+  let sensors = req.query.sensor
+
+  //console.log(sensor.split(','))
+
+  const sql = `select time,${sensors} from ${tbl} WHERE time > NOW() - INTERVAL 1 DAY ORDER BY time desc;`
 
   const rows = await db.querys(sql)
+  
+  // Need to reorder the data for plotting
+  let sensorLst = sensors.split(',')
+  rtnData = {}
+  rtnData.time = []
 
-  // Prepare to return Volts, Temperature, Impedance, Balance
-  innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0], ...rows[3][0] }
+  rtnData.sensors = {}
+  for (sen of sensorLst) { rtnData.sensors[sen] = Array(rows.length) }
 
-  // spinner and data times. Impedance is only updated once a day. 
-  time = rows[0][0]['time']  // spinner
-  innerHTML['timeFmt'] = new Date(rows[0][0]['time']).toLocaleString('en-US', {hour12: false})
-  innerHTML['timeFmtR'] = new Date(rows[2][0]['time']).toLocaleString('en-US', {hour12: false})
+  for (i=0;i<rows.length;i++){
+    rtnData.time.push(rows[i]['time'])
+    for ( sen of sensorLst ) {
+      rtnData.sensors[sen][i] = rows[i][sen]   // reorder
+    }
+  }
 
-  let style = {}
-  // --------------------------------------
-  // Voltage 
-  // --------------------------------------
-  let spHighVolt = req.cookies.spHighVolt
-  let spLowVolt  = req.cookies.spLowVolt
-
-  var [a,b] = util.tblProc('v',rows[0][0],spHighVolt,spLowVolt)
-  innerHTML['volt'] = a
-  style['volt'] = b
-
- // [innerHTML['volt'],style['volt']] = util.tblProc('v',rows[0][0],spHighVolt,spLowVolt)
-
-
-  // ---- Temperature stats -------------------
-  let spHighTemp = req.cookies.spHighTemp
-  let spLowTemp  = req.cookies.spLowTemp
-
-  var [a,b] = util.tblProc('t',rows[1][0],spHighTemp,spLowTemp)
-  innerHTML['temp'] = a
-  style['temp'] = b
-
-  // // ---- Impedance stats ------------------
-  let spHighImpedance = req.cookies.spHighImpedance
-  let spLowImpedance  = req.cookies.spLowImpedance
-
-  var [a,b] = util.tblProc('r',rows[2][0],spHighImpedance,spLowImpedance)
-  innerHTML['impedance'] = a
-  style['impedance'] = b
-
-  // ---- Balance stats ------------------
-  let spHighBalance = req.cookies.spHighBalance
-  let spLowBalance  = req.cookies.spLowBalance
-
-  var [a,b] = util.tblProc('b',rows[3][0],spHighBalance,spLowBalance)
-  innerHTML['balance'] = a
-  style['balance'] = b
-
-  res.json({time:time,innerHTML:innerHTML,style:style}) 
+  res.json(rtnData) 
 })
-
+ 
 module.exports = router;

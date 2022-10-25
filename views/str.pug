@@ -9,7 +9,7 @@ block content
       hr
   .container
 
-    .row.border.border-primary(style="background-color: #d0d4c0;")
+    .row.border.border-primary.strrow.ms-1()
       .col-2
         table.maxminVolt.maxmin(class="table-bordered caption-top")
           caption Max Voltages
@@ -47,7 +47,7 @@ block content
             td
 
       .col-7
-        table#volt(class="table-bordered caption-top traytbl", style="width:400px")
+        table(class="table-bordered caption-top traytbl")
           caption Tray Voltages
           - var offset_cell = str_id * 70 + 1 
           - var rows = 7
@@ -63,7 +63,7 @@ block content
               - offset_cell = offset_cell + cols
               - row_cnt++
         include includes/spVolts.pug
-    .row(style="margin-top:10px; background-color: #d0d4c0;")
+    .row.border.border-primary.strrow.mt-3.ms-1()
       .col-3
         table.maxmin.table-bordered.caption-top()
           caption Max Temperature
@@ -99,7 +99,7 @@ block content
               - offset_cell = offset_cell + cols
               - row_cnt++
         include includes/spTemp.pug
-    .row(style="margin-top:10px; background-color: #d0d4c0;")
+    .row.border.border-primary.strrow.mt-3.ms-1()
       .col-3
         table.maxmin.table-bordered.caption-top()
           caption Max Balance 
@@ -134,10 +134,9 @@ block content
               - offset_cell = offset_cell + cols
               - row_cnt++
         include includes/spBalance.pug
-
-    .row(style="margin-top:10px; background-color: #d0d4c0;")
+    .row.border.border-primary.strrow.my-3.ms-1()
       .col-3
-        table.maxmin.table-bordered.caption-top.traytbl()
+        table.maxmin.table-bordered.caption-top()
           caption Max Impedance
           th Tray
           th mOhm

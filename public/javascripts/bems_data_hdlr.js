@@ -125,8 +125,7 @@ function get_home_data(clearFaults=0) {
 
             //dh = dataHdlr({fltAlm:fltAlm}) // Add handler fault/alarm display
             DH.process(data)
-            highlightVolts(/^vM\w+?Val\d+/) // matches vMaxVal or vMinVal
-            
+
          },
          complete: function(){
             clearTimeout(timeoutId)
@@ -242,9 +241,6 @@ function get_chg_data(action) {
             let dh = dataHdlr()
             dh.process(data)
 
-            highlightVolts(/^v\d+/)
-            highlightBalance()
-
          },
          complete: function(){
             // clear previous so don't stack'm up
@@ -277,10 +273,6 @@ function get_aux_data() {
             // --- display by id ----
             let dh = dataHdlr()
             dh.process(data)
-
-            //highlightTempsAux()
-            //highlightVoltsAux(/^va\d+/)
-            //highlightVoltsAux(/^vM\w+?Val\d+/)
 
          },
          complete: function(){
@@ -361,11 +353,10 @@ function getSetPoints() {
          spHsh[keys[i]] = val
       }
 
-      // Also write to hdr so server can use on 
-      // the first xhr exchange
+      // Write to header
       writeCookie(keys[i],spHsh[keys[i]])
 
-      // generic for all pages
+      // Fill in Set Point Input fields
       let spEl = document.getElementById(keys[i])
       if ( spEl != null ) {
          spEl.value = spHsh[keys[i]]
@@ -537,197 +528,6 @@ function fltAlm(fltLst) {
 }
 
 // ------------------------------------
-// --- Highlighting  ------------------
-// ------------------------------------
-
-// ---------- Highlight Volts ---------
-function highlightVolts(re=/^v\d+/) {
-
-   const tableVolt = document.querySelector('#volt');
-   var ids = tableVolt.querySelectorAll('td')
- 
-   // Get setpoint values 
-   let spHighVolt = document.getElementById("spHighVolt").value
-   let spLowVolt = document.getElementById("spLowVolt").value
-
-   // Init stats variables
-   let numHighVolt = 0
-   let numLowVolt  = 0
-
-   //  let re1 = /v\w+Val\d+$/
- 
-   for (let idx=0; idx<ids.length; idx++) {
-         let el = ids[idx]
-         let val = parseFloat(el.innerText)
-         if ( val > 0  ) {
-            setColors(el,val)       
-         } 
-         else {
-            el.style.backgroundColor = 'black'
-         } 
-   }
-
-   let numEl = document.getElementById('numHighVolt')
-   if ( numEl != null ) numEl.innerHTML = numHighVolt
-         
-   numEl = document.getElementById('numLowVolt')
-   if ( numEl != null ) numEl.innerHTML = numLowVolt
-
-   // Now minmax tables
-   let idx
-   for (let i=0;i<10;i++){
-      idx = document.getElementById('vMaxKey'+i).innerHTML
-      document.getElementById('vMaxRow'+i).style.backgroundColor = document.getElementById('v'+idx).style.backgroundColor
-
-      idx = document.getElementById('vMinKey'+i).innerHTML
-      document.getElementById('vMinRow'+i).style.backgroundColor = document.getElementById('v'+idx).style.backgroundColor
-   }
-
-   function setColors(el,val) {
-
-      el.style.backgroundColor  = "forestgreen"
-      if ( val >= spHighVolt) {
-         el.style.backgroundColor  = "#EE2222"
-         numHighVolt++
-      }else if ( val <= spLowVolt ){
-         el.style.backgroundColor  = "yellow"
-         numLowVolt++
-      } 
-   }
-}
-
-// ---------- Highlight Volts Aux ---------
-function highlightVoltsAux(re=/^va\d+/) {
-
-   var ids = document.querySelectorAll('[id]');
-   
-   //const re = /^va?\d+/
-
-   let spHighVolt = document.getElementById("spHighVoltAux").value
-   let spLowVolt = document.getElementById("spLowVoltAux").value
-   let numHighVolt = 0
-   let numLowVolt  = 0
-   ids.forEach( (el, inx) => {
-      if ( re.test(el.id) ) {
-
-         let val = parseFloat(el.innerText)
-         el.style.backgroundColor  = "forestgreen"
-         if ( val >= spHighVolt) {
-            el.style.backgroundColor  = "#EE2222"
-            numHighVolt++
-         }else if ( val <= spLowVolt ){
-            el.style.backgroundColor  = "yellow"
-            numLowVolt++
-         } 
-      } 
-   })
-
-   let numEl = document.getElementById('numHighVoltAux')
-   if ( numEl != null ) numEl.innerHTML = numHighVolt
-         
-   numEl = document.getElementById('numLowVoltAux')
-   if ( numEl != null ) numEl.innerHTML = numLowVolt
-}
-
-// ---------- Highlight Temps ---------
-function highlightTemps() {
-   var ids = document.querySelectorAll('[id]');
-   
-   const re = /^t\d+/
-
-   let spHighTemp = document.getElementById("spHighTemp").value
-   let numHighTemp = 0
- 
-   ids.forEach( (el, inx) => {
-      if ( re.test(el.id) ) {
-
-         let val = parseFloat(el.innerText)
-         el.style.backgroundColor  = "forestgreen"
-         if (val >= spHighTemp) {
-            el.style.backgroundColor  = "#EE2222"
-            numHighTemp++
-         } 
-      } 
-   })
-
-   let numEl = document.getElementById('numHighTemp')
-   if ( numEl != null ) numEl.innerHTML = numHighTemp
-}
-
-// ---------- Highlight Balance ---------
-function highlightBalance() {
-
-   var ids = document.querySelectorAll('[id]');
-      
-   const re = /^b\d+/
-
-   let spHighBalance = document.getElementById("spHighBalance").value
-   let numHighBalance = 0
-
-   ids.forEach( (el, inx) => {
-      if ( re.test(el.id) ) {
-
-         let val = parseFloat(el.innerText)
-         el.style.backgroundColor  = "forestgreen"
-         if (val >= spHighBalance) {
-            el.style.backgroundColor  = "#EE2222"
-            numHighBalance++
-         } 
-      } 
-   })
-
-   let numEl = document.getElementById('numHighBalance')
-   if ( numEl != null ) numEl.innerHTML = numHighBalance
-}
-
-// ---------- Highlight Impedance ---------
-function highlightImpedance() {
-   var ids = document.querySelectorAll('[id]');
-   
-   const re = /^r\d+/
-
-   let spHighImpedance = document.getElementById("spHighImpedance").value
-   let numHighImpedance = 0
- 
-   ids.forEach( (el, inx) => {
-      if ( re.test(el.id) ) {
-
-         let val = parseFloat(el.innerText)
-         el.style.backgroundColor  = "forestgreen"
-         if (val >= spHighImpedance) {
-            el.style.backgroundColor  = "#EE2222"
-            numHighImpedance++
-         } 
-      } 
-   })
-
-   let numEl = document.getElementById('numHighImpedance')
-   if ( numEl != null ) numEl.innerHTML = numHighImpedance
-}
-
-// -------------------------------------------
-function highlightTempsAux() {
-
-   // The aux temps are a short list, explicity call out lst
-   let auxTempLst = ['aux_cell_temp_1','aux_cell_temp_2','aux_cell_temp_3','aux_cell_temp_4','aux_amb_temp_1','aux_amb_temp_2']
- 
-   let spHighTempAux = document.getElementById("spHighTempAux").value
- 
-   for (let id of auxTempLst) {
-
-      let el = document.getElementById(id)
-
-      if ( el != null ) {
-         let val = parseFloat(el.innerText)
-         el.style.backgroundColor  = "forestgreen"
-         if (val >= spHighTempAux) {
-            el.style.backgroundColor  = "#EE2222"
-         } 
-      }
-   }
-}
-
-// ------------------------------------
 // --- Event Handlers ------------------
 // ------------------------------------
 $( document ).ready( () => {
@@ -748,11 +548,7 @@ $( document ).ready( () => {
          }
       }
 
-      console.log('event.target.id',event.target.id)
-
       data_xhr()
-      //highlightVolts()
-      //highlightTemps()
    })
 
    $("#clearFaults").click( () => { 
@@ -761,18 +557,14 @@ $( document ).ready( () => {
 
    // ------------- system
    $(".procSubmit").click( (event) => {
-      
       get_sys_data({id:event.target.id,cmd:event.target.innerHTML})
-
    })
-
-
 
 }) // Form Handler 
 
 
 // ---------- Cookie Utils ------------------------
-function writeCookie(name, value, days) {
+function writeCookie(name, value, days=30) {
 
        var expires = "";
 

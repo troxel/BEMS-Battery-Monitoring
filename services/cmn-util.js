@@ -67,10 +67,10 @@ function tblProc(prefx,hsh,spHigh,spLow) {
     let key = keys[i]
 
     if ( val == null ) {
-      style[key] = {backgroundColor:'black'}
+      style[key] = {backgroundColor:'#B7C0C0'}
     } 
     else if ( val >= spHigh ) {
-      style[key] = {backgroundColor:'#EE2222'}
+      style[key] = {backgroundColor:'#EE3333'}
       numHigh += 1
     }
     else if ( val <= spLow ){
@@ -97,6 +97,9 @@ function tblProc(prefx,hsh,spHigh,spLow) {
   let endInx =  keysNoNull.length - 1
   for ( let i = 0; i<lenRow; i++ ) {
     let ident = keysNoNull[i]            // ie v1,v2, etc.
+    
+    if (! ident) continue; 
+
     let tray = reTray.exec(ident)[0]
 
     innerHTML[prefx + "MinKey" + i] = tray

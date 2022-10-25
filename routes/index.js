@@ -33,9 +33,7 @@ router.get('/xhr', async function(req, res, next) {
 
   // Return object
   let htmlObj = {}
-
-  // Voltage stats
-  let Vstat = {} 
+  let style = {}
 
   let rtn = {}
   rtn['time'] = rows[0][0]['time']  // spinner
@@ -52,20 +50,32 @@ router.get('/xhr', async function(req, res, next) {
     htmlObj['vSumStr'+i] = _.sum(vVals.splice(0,69)).toFixed(0)
   }
 
-  // Populate max/min tables
-  htmlObj['vminmax'] = util.maxmin(vHash,'v')
+  // Populate and color max/min tables
+  let spHighVolt = req.cookies.spHighVolt
+  let spLowVolt  = req.cookies.spLowVolt
+  let spHighTemp  = req.cookies.spHighTemp
+
+  var [a,b] = util.tblProc('v',rows[0][0],spHighVolt,spLowVolt)
+  htmlObj['voltinner'] = a
+  style['voltColor'] = b
+
+  //var [a,b] = util.tblProc('b',rows[1][0],spHighBalance,0)
+  //rtnObj['style']['BalanceColor'] = b
 
   // Temperature stats
-  Tstat = {} 
-  tKeys = Object.keys(rows[1][0])
-  tVals = Object.values(rows[1][0])
-  tHash = rows[1][0]
-  delete tHash['time']
+  var [a,b] = util.tblProc('t',rows[1][0],spHighTemp,0)
+  htmlObj['tempinner'] = a
+  style['tempColor'] = b
 
-  // Note tAve is not used in the template... 
-  htmlObj['tAve'] = (_.sum(tVals)/tVals.length).toFixed(1)
+  // tKeys = Object.keys(rows[1][0])
+  // tVals = Object.values(rows[1][0])
+  // tHash = rows[1][0]
+  // delete tHash['time']
 
-  htmlObj['tminmax'] = util.maxmin(vHash,'t')
+  // // Note tAve is not used in the template... 
+  // htmlObj['tAve'] = (_.sum(tVals)/tVals.length).toFixed(1)
+
+  // htmlObj['tminmax'] = util.maxmin(vHash,'t')
 
   // Faults and Alarms ....
   if ( req.query.clearFaults ){
@@ -88,6 +98,7 @@ router.get('/xhr', async function(req, res, next) {
   // Prepare to return
   rtn['innerHTML'] = htmlObj
   rtn['fltAlm'] = fltAlm
+  rtn['style'] = style
  
   res.json(rtn) 
 })

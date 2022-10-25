@@ -7,11 +7,14 @@ html
 
     script(src='/jquery.min.js')
 
-    
+    // testing install with npm if it works
+    script(src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8")
+
     <!-- Bootstrap -->
     script(src='/js/bootstrap.min.js')
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
 
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    
     script(src="/javascripts/bems_data_hdlr.js", defer)
     meta(name="theme-color", content="#712cf9")
     meta(name="viewport", content="initial-scale=0.1")
@@ -38,6 +41,8 @@ html
             a.nav-link#chg(href="/chg") Charge
           li.nav-item
             a#sys.nav-link(href="/sys") System  
+          li.nav-item
+            a#sys.nav-link(href="/tnd") Trends
           li.nav-item
             a#sim.nav-link(href="/sim") Sim  
         #timeFmt(class="text-white font-weight-bold text-center bg-success",style="width:170px;")

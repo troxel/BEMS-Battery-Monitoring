@@ -13,8 +13,9 @@ var auxRouter   = require('./routes/aux');
 var envRouter   = require('./routes/env');
 var simRouter   = require('./routes/sim');
 var chgRouter   = require('./routes/chg');
-//var xhrRouter   = require('./routes/xhr');
 var sysRouter   = require('./routes/sys');
+var tndRouter   = require('./routes/tnd');
+//var xhrRouter   = require('./routes/xhr');
 
 var app = express();
 
@@ -31,6 +32,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
+app.use(express.static(__dirname + '/node_modules/bootstrap-select/dist'));
 app.use(express.static(__dirname + '/node_modules/jquery/dist'));
 
 /* app.use('/str/:str', (req,res,next) => {
@@ -52,6 +54,7 @@ app.use('/env', envRouter);
 app.use('/sim', simRouter);
 app.use('/sys', sysRouter);
 app.use('/chg', chgRouter);
+app.use('/tnd', tndRouter);
 //app.use('/xhr', xhrRouter);
 
 //console.dir(xhrRouter, { depth: null })

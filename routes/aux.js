@@ -36,17 +36,14 @@ router.get('/xhr', async function(req, res, next) {
   rtnObj['innerHTML']['voltColor'] = a
   rtnObj['style']['voltColor'] = b
 
-  // var [a,b] = util.tblProc('',rows[1][0],spHighTempAux,spLowTempAux)
-  // rtnObj['innerHTML']['tempColor'] = a
-  // rtnObj['style']['tempColor'] = b
+  var [a,b] = util.tblProc('',rows[1][0],spHighTempAux,spLowTempAux)
+  rtnObj['innerHTML']['tempColor'] = a
+  rtnObj['style']['tempColor'] = b
 
 
   rtnObj['innerHTML']['volts'] = rows[0][0]
   rtnObj['innerHTML']['temperature'] = rows[1][0]
   rtnObj['innerHTML']['i'] = rows[2][0]
-
-  // delete rows[0][0]['time']
-  // rtnObj['innerHTML']['vmaxmin'] = util.maxmin(rows[0][0],'v',10)
 
   res.json( rtnObj )
 

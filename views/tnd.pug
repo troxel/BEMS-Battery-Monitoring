@@ -1,0 +1,139 @@
+extends layout
+
+block content
+
+  input#str_id(type="hidden",value=str_id)
+  .container
+    .row  
+      Trends
+      hr
+  .container.form-group
+    .row.border.border-primary.strrow.ms-1.form-horizontal()
+      .col-3
+        select#selTbl1.select.form-select.mt-2.mb-2()
+          option(value=null) Select Data Source 1
+          each opt in selTblLst
+            option(value=opt.id) #{opt.lbl}
+      .col-3
+        select#selSensor1.select.form-select.d-none.mt-2.mb-2(multiple=true)
+
+    .row
+      .col-sm-6
+
+  .container
+
+    .row.border.border-primary.ms-1.mt-1()
+      .col
+        #plot
+
+
+  script.
+    $( document ).ready( () => {
+
+      // Column names in tables - some inconsistancy attempt to fix later
+      var tblFlds = {}
+      tblFlds.volts       = [...Array(280).keys()].map( i => 'v' + (i+1) )
+      tblFlds.temperature = [...Array(280).keys()].map( i => 't' + (i+1) )
+      tblFlds.balance     = [...Array(280).keys()].map( i => 'b' + (i+1) )
+      tblFlds.impedance   = [...Array(280).keys()].map( i => 'r' + (i+1) )
+      tblFlds.i_prop_str  = [...Array(4).keys()].map( i => 'i_str' + (i) )  // zero based :(
+      tblFlds.volts_aux   = [...Array(280).keys()].map( i => 'va' + (i+1) )  
+      tblFlds.temperature_aux  = ['aux_cell_temp_1','aux_cell_temp_2','aux_cell_temp_3','aux_cell_temp_4','aux_amb_temp_1','aux_amb_temp_2']
+      tblFlds.i_aux  = ['i_aux']
+      tblFlds.env = ['batt_h2_1','batt_fire_1','batt_smoke','ee_fire','ee_smoke','machine_fire','machine_smoke','batt_h2_2','batt_fire_2','batt_temp','ee_temp','machine_temp_1','machine_temp_2']
+      tblFlds.error_wd = [...Array(8).keys()].map( i => 'error_wd' + (i+1) )
+
+      // Object of functions to build sensors select
+      function genFldSelect(tbl) {
+
+        if ( ! tblFlds.hasOwnProperty(tbl) ){
+          console.error('No DB Table of that name ',tbl)
+          return null
+        }
+
+        var sel = $("#selSensor1").empty()
+        sel.removeClass( "d-none" ).addClass( "d-block" ) // On page load it is hidden
+        sel.append($("<option/>").attr('disabled',true).text("Select Sensors"))
+        for( i of tblFlds[tbl] ) {
+          sel.append($("<option/>").attr('value',i).text(i))
+        }
+
+      } 
+
+      // ----------------------
+      // -- Event handlers ----
+      // ----------------------
+      $("#selTbl1").change( (event) => {
+        let tblSelected = $("#selTbl1").val()
+        if (tblSelected){
+          genFldSelect(tblSelected)
+        }
+      })
+
+      $("#selSensor1").change( (event) => {
+
+        let action = {}
+        action.tbl = $("#selTbl1").val()
+        action.sensor = $("#selSensor1").val()
+        get_tnd_data(action)
+
+      })      
+
+      // ------------------------
+      // XHR Data
+      // ------------------------
+      function get_tnd_data(action) {
+
+        let url = `${url_srv}/tnd/xhr`;
+
+        if ( typeof action != 'undefined') {
+          //const encoded = encodeURI(uri);
+          url += `?tbl=${action.tbl}&sensor=${action.sensor}`
+        }
+
+        var xhr = $.ajax({
+              url: url,
+              success: function(data){ 
+                  if ( data['error'] ) {
+                    this.error(this.xhr,this.textStatus,data['error'])
+                    return
+                  }
+
+                  plotTnd(data)              
+              },
+              complete: function(){
+                  clearTimeout(timeoutId)
+                  timeoutId = setTimeout(get_tnd_data,90000,action)
+              },
+              error: function (jqXhr, textStatus, errorMessage) {
+                  console.error('Ajax Error! ' + errorMessage);
+              },
+              timeout:50000,
+              dataType: 'json',        
+        });
+      }
+
+      // ------------------------
+      // -- Plot functions ----- 
+      // ------------------------
+      function plotTnd(data) {
+      
+        let traceLst = []
+        for (const [sen, dataSen] of Object.entries(data.sensors)) {
+
+          traceLst.push( {
+            x: data.time,
+            y: dataSen,
+            name: sen,
+            mode: 'lines+markers',
+            type: 'scatter',
+            rangemode: 'tozero',
+            ticks: 'outside',
+          })
+        }
+
+        Plotly.newPlot('plot', traceLst);
+      }              
+
+    })
+

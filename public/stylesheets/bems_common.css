@@ -38,7 +38,8 @@ nav {
 .maxmin td { font-size: 12px; text-align:right; padding-right:7px; height:13x;}
 .maxmin caption { font-size: 14px; padding:0px; font-weight: bold;}
 
-.traytbl caption { font-size: 16px; font-weight: bold; }
+.strrow{ background-color:#f0f9f7; }
+.traytbl caption { font-size: 16px; font-weight: bold; width:475px}
 
 .maxminnum td { font-size: .9em; }
 
