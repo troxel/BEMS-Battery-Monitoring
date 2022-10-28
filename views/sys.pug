@@ -3,14 +3,13 @@ extends layout
 block content
   .container
     .row
-      .col-4
-
+      .col-5
         h5 BEMS Processes
         table.table-bordered(style="margin-bottom:20px;width:100%;")
           tr
             th Cmd
             th PID 
-            th MEM%
+            th MEM
             th CPU%
             th Control
           each obj, key in cmdObj
@@ -38,7 +37,7 @@ block content
             td#auxHost.text-center
             td.text-center 
               button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="halt_aux") Halt
-      .col
+      .col-7
         h4 Top
         pre
           #topBr

@@ -4,7 +4,7 @@ block content
   .container
     section.row
       .col
-        table.table(width="100%")
+        table.table.border.border-primary.strrow.shadow(width="100%")
           tr
             th
             th Str 1
@@ -28,7 +28,7 @@ block content
             td#i_aux  
     section.row
       .col-3 
-        table.maxmin.table-bordered.caption-top()
+        table.maxmin.table-bordered.caption-top.shadow.strrow()
           caption= "Low Voltages"
           th Tray 
           th Volts
@@ -39,7 +39,7 @@ block content
               td(id="vMinVal" + row)
               - row++
 
-        table.maxmin.table-bordered.caption-top()
+        table.maxmin.table-bordered.caption-top.shadow.mt-2.strrow()
           caption Maximum Temperature
           th Tray 
           th °F
@@ -51,7 +51,7 @@ block content
               td(id="tMaxVal" + row) 
               - row++
       .col
-        table.table-bordered.w-100
+        table.table-bordered.w-100.mt-4.shadow.strrow
           thead
             tr(style="text-align:center")
               th(style="width:170px;") Time
@@ -66,7 +66,7 @@ block content
 
     section.row
       .col
-        table
+        table.mt-2
           tr
             th(style="font-strength:bold; font-size:1.2em") Setpoints
             th High 

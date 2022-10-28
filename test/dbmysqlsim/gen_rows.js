@@ -36,7 +36,7 @@ var randomValues = {
 }
 
 var con = mysql.createConnection({
-  host: "localhost",
+  host: "127.0.0.1",
   user: "webdev",
   password: "webdev1!",
   database: "bems"
@@ -64,7 +64,7 @@ function insert_tray_rows(){
 
 		for (let i = 1; i <= 280; i++) {
 			let val = randomValues[j]()
-			if ( Math.random() > 0.9 ) { val = 'NULL'}  // Text missing vals
+			if ( Math.random() > 0.97777777 ) { val = 'NULL'}  // Text missing vals
 			tLst.push( val )
 		}
 

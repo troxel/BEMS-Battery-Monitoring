@@ -9,7 +9,7 @@ block content
       hr
   .container
 
-    .row.border.border-primary.strrow.ms-1()
+    .row.border.border-primary.strrow.ms-1.shadow()
       .col-2
         table.maxminVolt.maxmin(class="table-bordered caption-top")
           caption Max Voltages
@@ -63,7 +63,7 @@ block content
               - offset_cell = offset_cell + cols
               - row_cnt++
         include includes/spVolts.pug
-    .row.border.border-primary.strrow.mt-3.ms-1()
+    .row.border.border-primary.strrow.mt-3.ms-1.shadow()
       .col-3
         table.maxmin.table-bordered.caption-top()
           caption Max Temperature
@@ -99,7 +99,7 @@ block content
               - offset_cell = offset_cell + cols
               - row_cnt++
         include includes/spTemp.pug
-    .row.border.border-primary.strrow.mt-3.ms-1()
+    .row.border.border-primary.strrow.mt-3.ms-1.shadow()
       .col-3
         table.maxmin.table-bordered.caption-top()
           caption Max Balance 
@@ -134,7 +134,7 @@ block content
               - offset_cell = offset_cell + cols
               - row_cnt++
         include includes/spBalance.pug
-    .row.border.border-primary.strrow.my-3.ms-1()
+    .row.border.border-primary.strrow.my-3.ms-1.shadow()
       .col-3
         table.maxmin.table-bordered.caption-top()
           caption Max Impedance
@@ -171,9 +171,11 @@ block content
         include includes/spImpedance.pug
 
   script.
-    $( document ).ready( () => {
-      getSetPoints()   
 
+    $( document ).ready( () => {
+
+      getSetPoints()   
+      
       data_xhr = get_str_data
       data_xhr()
 

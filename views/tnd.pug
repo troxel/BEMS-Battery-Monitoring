@@ -2,16 +2,21 @@ extends layout
 
 block content
 
-  input#str_id(type="hidden",value=str_id)
+
   .container
     .row  
       Trends
-      hr
-  .container.form-group
+  .container
+
+    .row.border.border-primary.ms-1.mt-1()
+      .col
+        #plot
+
+  .container.form-group.mt-2
     .row.border.border-primary.strrow.ms-1.form-horizontal()
       .col-3
         select#selTbl1.select.form-select.mt-2.mb-2()
-          option(value=null) Select Data Source 1
+          option() Select Data Source 1
           each opt in selTblLst
             option(value=opt.id) #{opt.lbl}
       .col-3
@@ -20,11 +25,6 @@ block content
     .row
       .col-sm-6
 
-  .container
-
-    .row.border.border-primary.ms-1.mt-1()
-      .col
-        #plot
 
 
   script.

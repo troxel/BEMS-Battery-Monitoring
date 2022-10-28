@@ -1,0 +1,37 @@
+extends layout
+
+block content
+  .container.form-group.mt-2
+    .row.border.border-primary.strrow.ms-1.form-horizontal.shadow()
+      .col-5
+
+        select#selLgs.select.form-select.mt-2.mb-2()
+          option(id=null) Select Log
+          each opt in selLgsLst
+            option(value=opt.fs) #{opt.lbl}
+
+  .container.form-group.mt-5
+    .row.border.border-primary.strrow.ms-1.form-horizontal.shadow()
+      .col
+        pre#logBr
+
+
+  script.
+    $( document ).ready( () => {
+
+      data_xhr = get_lgs_data
+      data_xhr()
+
+      $("#selLgs").change( (event) => {
+        let lgsSelected = $("#selLgs").val()
+        if (lgsSelected){
+          let action = {}
+          action.lg = lgsSelected
+          action.lns = 70
+          get_lgs_data(action)
+        }
+      })
+
+      let el = document.getElementById("lgs")
+      if (el != null) el.classList.add("active")
+    })

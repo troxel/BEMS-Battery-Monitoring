@@ -21,8 +21,8 @@ html
 
 
   body
-    nav.navbar.navbar-expand.navbar-dark.bg-dark.mb-4
-      .container
+    nav.navbar.navbar-expand.navbar-dark.bg-dark.mb-4.shadow
+      .container.shadow
         a.navbar-brand(href='/') BEMS
         ul.navbar-nav.me-auto.mb-2.mb-lg-0
           li.nav-item
@@ -42,7 +42,9 @@ html
           li.nav-item
             a#sys.nav-link(href="/sys") System  
           li.nav-item
-            a#sys.nav-link(href="/tnd") Trends
+            a#tnd.nav-link(href="/tnd") Trends
+          li.nav-item
+            a#lgs.nav-link(href="/lgs") Logs
           li.nav-item
             a#sim.nav-link(href="/sim") Sim  
         #timeFmt(class="text-white font-weight-bold text-center bg-success",style="width:170px;")

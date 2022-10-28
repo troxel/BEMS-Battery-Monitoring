@@ -9,23 +9,23 @@ var timeoutId
 var data_xhr
 
 // Used by all pages to display spinner and time
-let spin = ['|','/','—','\\']
+let spinChrs = ['|','/','—','\\']
 let spinCnt = 0
 function spinner(time) {
-   let timeThreshold = 20000 // 20 seconds 
+   
+   let timeThreshold = 20000 // 20 seconds of lag before alerting
 
-   let spnId = document.getElementById('spn')
-   if ( spnId != null ) {
-      spnId.innerHTML = spin[spinCnt]
-      spinCnt++
-      spinCnt = spinCnt % 4
+   spn.innerHTML = spinChrs[spinCnt]
+   spinCnt++
+   spinCnt = spinCnt % 4
 
-      spnId.classList.remove('bg-danger')
-      spnId.classList.add('bg-success')
-   }
-
+   spn.classList.remove('bg-danger')
+   spn.classList.add('bg-success')
+   
    if ( time ) {
       let diff = new Date() - new Date(time)
+
+      timeFmt.innerHTML = new Date(time).toLocaleString('en-US', {hour12: false})
 
       if ( diff > timeThreshold ){
          timeFmt.classList.remove('bg-success')
@@ -35,13 +35,9 @@ function spinner(time) {
          timeFmt.classList.remove('bg-danger')
       }
    }
-
-   let timeId = document.getElementById('timeFmt')
-   if ( timeId != null ) {
-   
-   }
 }
 
+// Used in error events
 function spinnerX() {
 
    let spnId = document.getElementById('spn')
@@ -96,6 +92,7 @@ function get_str_data() {
          },
          error: function (jqXhr, textStatus, errorMessage) {
             console.error('Ajax Error! ' + errorMessage);
+            spinnerX()
          },
          timeout:30000,
          dataType: 'json',        
@@ -160,7 +157,9 @@ function get_sys_data(action) {
                this.error(this.xhr,this.textStatus,data['error'])
                return
             }
-         
+
+            spinner(data.time)
+
             // --- display by id ----
             let dh = dataHdlr()
             dh.process(data)
@@ -172,6 +171,7 @@ function get_sys_data(action) {
          },
          error: function (jqXhr, textStatus, errorMessage) {
             console.error('Ajax Error! ' + errorMessage);
+            spinnerX()
          },
          timeout:30000,
          dataType: 'json',        
@@ -237,6 +237,8 @@ function get_chg_data(action) {
                return
             }
          
+            spinner(data.time)
+
             // --- display by id ----
             let dh = dataHdlr()
             dh.process(data)
@@ -249,6 +251,7 @@ function get_chg_data(action) {
          },
          error: function (jqXhr, textStatus, errorMessage) {
             console.error('Ajax Error! ' + errorMessage);
+            spinnerX()
          },
          timeout:30000,
          dataType: 'json',        
@@ -270,6 +273,8 @@ function get_aux_data() {
                return
             }
          
+            spinner(data.time)
+
             // --- display by id ----
             let dh = dataHdlr()
             dh.process(data)
@@ -282,6 +287,7 @@ function get_aux_data() {
          },
          error: function (jqXhr, textStatus, errorMessage) {
             console.error('Ajax Error! ' + errorMessage);
+            spinnerX()
          },
          timeout:30000,
          dataType: 'json',        
@@ -303,6 +309,8 @@ function get_env_data() {
                return
             }
          
+            spinner(data.time)
+
             // --- display by id ----
             let dh = dataHdlr()
             dh.process(data)
@@ -314,11 +322,55 @@ function get_env_data() {
          },
          error: function (jqXhr, textStatus, errorMessage) {
             console.error('Ajax Error! ' + errorMessage);
+            spinnerX()
          },
          timeout:5000,
          dataType: 'json',        
    });
 }
+
+// ----------------------------------------------------------
+// --------------------get lgs xhr    -----------------------
+// ----------------------------------------------------------
+function get_lgs_data(action) {
+
+   let url = `${url_srv}/lgs/xhr`;
+
+   if ( typeof action != 'undefined') {
+      let query = new URLSearchParams(action).toString();
+      console.log(query)
+      url += '?' + query
+      console.log(url)
+   }
+
+   var xhr = $.ajax({
+         url: url,
+         success: function(data){ 
+            if ( data['error'] ) {
+               this.error(this.xhr,this.textStatus,data['error'])
+               return
+            }
+         
+            spinner(data.time)
+
+            // --- display by id ----
+            let dh = dataHdlr()
+            dh.process(data)
+         },
+         complete: function(){
+            // clear previous so don't stack'm up
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(get_lgs_data,30000,action)
+         },
+         error: function (jqXhr, textStatus, errorMessage) {
+            console.error('Ajax Error! ' + errorMessage);
+            spinnerX()
+         },
+         timeout:5000,
+         dataType: 'json',        
+   });
+}
+
 
 // -------------- End get functions ----------------
 
@@ -514,9 +566,7 @@ function fltAlm(fltLst) {
       let cell0 = row.insertCell(0)
       let cell1 = row.insertCell(1)
 
-      let timefmt = (new Date(fltLst[i]['time'])).toLocaleString('en-GB', { timeZone: 'America/Los_Angeles',hour24: false })
-
-      cell0.innerHTML = timefmt
+      cell0.innerHTML = (new Date(fltLst[i]['time'])).toLocaleString('en-GB', { timeZone: 'America/Los_Angeles',hour24: false })
       cell1.innerHTML = fltLst[i]['msg']
       if ( fltLst[i].flt ) {
          row.classList.add("bg-danger");

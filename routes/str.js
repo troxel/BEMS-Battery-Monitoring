@@ -80,7 +80,6 @@ router.get('/xhr/:str', async function(req, res, next) {
 
   // spinner and data times. Impedance is only updated once a day. 
   time = rows[0][0]['time']  // spinner
-  innerHTML['timeFmt'] = new Date(rows[0][0]['time']).toLocaleString('en-US', {hour12: false})
   innerHTML['timeFmtR'] = new Date(rows[2][0]['time']).toLocaleString('en-US', {hour12: false})
 
   let style = {}

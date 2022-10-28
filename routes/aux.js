@@ -29,8 +29,9 @@ router.get('/xhr', async function(req, res, next) {
   let spLowTempAux  = req.cookies.spLowTempAux
 
   let rtnObj = {}
-  rtnObj['innerHTML'] = {}
-  rtnObj['style'] = {}
+  rtnObj.innerHTML = {}
+  rtnObj.style = {}
+  rtnObj.time = new Date(rows[0][0]['time']).toLocaleString('en-US', {hour12: false})
 
   var [a,b] = util.tblProc('va',rows[0][0],spHighVoltAux,spLowVoltAux)
   rtnObj['innerHTML']['voltColor'] = a

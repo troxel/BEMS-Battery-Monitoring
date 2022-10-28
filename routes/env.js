@@ -32,14 +32,12 @@ router.get('/xhr', async function(req, res, next) {
   const rows = await db.querys(sql)
 
   //rtnObj['innerHTML'] = rows[0][0]
-  rtnObj['error_wd'] = rows[1][0]
+  rtnObj.error_wd = rows[1][0]
+  rtnObj.time = rows[0][0].time
   
   //for (let k in rows[0][0]){
    // rtnObj['setAttribute'][k] = {'title':rows[0][0][k]}
   //}
-
-  console.log(rtnObj['setAttribute'])
-  //rtnObj['setAttribute']['time'] = {"style":"background-color: red"}
 
   // ------------- err word 8 -------------------
   let error_wd8 = rows[1][0].error_wd8

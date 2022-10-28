@@ -7,7 +7,7 @@ block content
       .col-xs Charge Overview
       hr
   .container
-    .row.border.gy-0(style="background-color: #d0e4d0;")
+    .row.border.gy-0.ms-1.strrow.border-primary()
       - var innerLoopStep = 70 
       - var outerLoopStep = 10 
       - var rows = 4
@@ -48,11 +48,10 @@ block content
                     - row_cnt++
               - tbl_cnt++
   .container
-    .row
-      .col-2
-      .col
+    .row.border.border-primary.strrow.mb-4.ms-1.mt-1
+      .col-7
         include includes/spVolts.pug
-      .col
+      .col-5
         include includes/spBalance.pug
 
   script.

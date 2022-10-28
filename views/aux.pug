@@ -5,11 +5,16 @@ block content
   input#str_id(type="hidden",value=str_id)
   .container
     .row  
-      .col-xs String <span id="str_lbl">#{str_lbl}</span> Voltage <span id="vSum"></span> Voltage Ave <span id="vAve"></span>
+      .col-3.lead String Voltage: 
+        span#vaSum(style="font-weight:700;")
+        span.ms-1 v
+      .col-4.lead Cell Voltage Ave: 
+        span#vaAve(style="font-weight:700;")
+        span.ms-1 v
       hr
   .container
 
-    .row.border(style="background-color: #f0e4c0;")
+    .row.border.border-primary.strrow.ms-1()
       .col-2
         table.maxmin(class="table-bordered caption-top")
           caption= "Maximum Voltages"
@@ -64,9 +69,7 @@ block content
                   td
         include includes/spVoltsAux.pug
 
-    .row(style="margin-top:10px; background-color: #d0d4c0;")
-      
-
+    .row.border.border-primary.strrow.ms-1.mt-2()
       .col-4
         .caption Aux Current amps
         table(class="table-bordered caption-top")
@@ -82,11 +85,12 @@ block content
               td.cfs(id="aux_cell_temp_4", title="aux_cell_temp_4", width="40px")  4
       .col-3 
         .caption Aux Ambient Temperatures °F
-        table(class="table-bordered caption-top")
+        table.mb-1(class="table-bordered caption-top")
             tr
               td.cfs(id="aux_amb_temp_1", title="aux_amb_temp_1", width="40px")  1
               td.cfs(id="aux_amb_temp_2", title="aux_amb_temp_2", width="40px")  2
-    .row(style="margin-bottom:10px; background-color: #d0d4c0;")
+    
+    .row.border.border-primary.strrow.ms-1.mt-2.mb-4()
       .col-4
       .col-4
         .form-group(style="margin-top:10px; margin-bottom:10px;")

@@ -37,8 +37,7 @@ router.get('/xhr', async function(req, res, next) {
 
   let rtn = {}
   rtn['time'] = rows[0][0]['time']  // spinner
-  htmlObj['timeFmt'] = new Date(rows[0][0]['time']).toLocaleString('en-US', {hour12: false})
-
+ 
   delete rows[0][0]['time']
 
   let vKeys = Object.keys(rows[0][0])
