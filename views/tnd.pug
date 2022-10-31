@@ -17,15 +17,19 @@ block content
       .col-3
         select#selTbl1.select.form-select.mt-2.mb-2()
           option() Select Data Source 1
-          each opt in selTblLst
+          each opt in tblLst
             option(value=opt.id) #{opt.lbl}
       .col-3
         select#selSensor1.select.form-select.d-none.mt-2.mb-2(multiple=true)
 
+      .col-1
+      .col-3
+        select#selRng.select.form-select.mt-2.mb-2.d-none()
+          option(value=null,'disabled') Select Data Range
+          each opt of rngLst
+            option(value=opt) #{opt} Days
     .row
-      .col-sm-6
-
-
+      .col
 
   script.
     $( document ).ready( () => {
@@ -51,13 +55,12 @@ block content
           return null
         }
 
-        var sel = $("#selSensor1").empty()
+        let sel = $("#selSensor1").empty()
         sel.removeClass( "d-none" ).addClass( "d-block" ) // On page load it is hidden
         sel.append($("<option/>").attr('disabled',true).text("Select Sensors"))
         for( i of tblFlds[tbl] ) {
           sel.append($("<option/>").attr('value',i).text(i))
         }
-
       } 
 
       // ----------------------
@@ -66,6 +69,7 @@ block content
       $("#selTbl1").change( (event) => {
         let tblSelected = $("#selTbl1").val()
         if (tblSelected){
+          $("#selRng").removeClass( "d-none" ).addClass( "d-block" )
           genFldSelect(tblSelected)
         }
       })
@@ -75,9 +79,17 @@ block content
         let action = {}
         action.tbl = $("#selTbl1").val()
         action.sensor = $("#selSensor1").val()
+        action.rng = $("#selRng").val() || 1 
         get_tnd_data(action)
-
       })      
+
+      $("#selRng").change( (event) => {
+        let action = {}
+        action.tbl = $("#selTbl1").val()
+        action.sensor = $("#selSensor1").val()
+        action.rng = $("#selRng").val() || 1
+        get_tnd_data(action)
+      })
 
       // ------------------------
       // XHR Data
@@ -87,8 +99,9 @@ block content
         let url = `${url_srv}/tnd/xhr`;
 
         if ( typeof action != 'undefined') {
-          //const encoded = encodeURI(uri);
-          url += `?tbl=${action.tbl}&sensor=${action.sensor}`
+          //url += `?tbl=${action.tbl}&sensor=${action.sensor}`
+          let query = new URLSearchParams(action).toString();
+          url += '?' + query
         }
 
         var xhr = $.ajax({
@@ -98,6 +111,9 @@ block content
                     this.error(this.xhr,this.textStatus,data['error'])
                     return
                   }
+
+                  console.log(data.time)
+                  spinner(data.time)
 
                   plotTnd(data)              
               },
@@ -122,7 +138,7 @@ block content
         for (const [sen, dataSen] of Object.entries(data.sensors)) {
 
           traceLst.push( {
-            x: data.time,
+            x: data.timeSeries,
             y: dataSen,
             name: sen,
             mode: 'lines+markers',

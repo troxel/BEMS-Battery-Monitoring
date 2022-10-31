@@ -18,6 +18,8 @@ async function querys(sql, params) {
     return results;
   } catch(err) {
     console.error('DB Error :', err.sqlMessage)
+    console.error(err.sql)
+    console.error(err.code)
     connection.end()
     return false
   }
