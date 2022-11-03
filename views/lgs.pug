@@ -4,11 +4,14 @@ block content
   .container.form-group.mt-2
     .row.border.border-primary.strrow.ms-1.form-horizontal.shadow()
       .col-5
-
-        select#selLgs.select.form-select.mt-2.mb-2()
+        select#selLg.select.form-select.mt-2.mb-2()
           option(id=null) Select Log
-          each opt in selLgsLst
-            option(value=opt.fs) #{opt.lbl}
+          each opt of selLbl
+            option(value=opt) #{opt}
+
+      .col-5
+      .col-2
+        button#refresh.btn.btn-primary.mt-2.d-none.shadow(type="button") Refresh
 
   .container.form-group.mt-5
     .row.border.border-primary.strrow.ms-1.form-horizontal.shadow()
@@ -22,15 +25,32 @@ block content
       data_xhr = get_lgs_data
       data_xhr()
 
-      $("#selLgs").change( (event) => {
-        let lgsSelected = $("#selLgs").val()
-        if (lgsSelected){
+      $("#selLg").change( (event) => {
+        let lg = $("#selLg").val()
+        if (lg){
           let action = {}
-          action.lg = lgsSelected
+          action.lg = lg
           action.lns = 70
           get_lgs_data(action)
         }
+
+        $("#refresh").removeClass( "d-none" ).addClass( "d-block" )
+
       })
+
+      $("#refresh").click( (event) => {
+        sndAction()
+      })
+
+      function sndAction(){
+        let lg = $("#selLg").val()
+        if (lg){
+          let action = {}
+          action.lg = lg
+          action.lns = 70
+          get_lgs_data(action)
+        }
+      }
 
       let el = document.getElementById("lgs")
       if (el != null) el.classList.add("active")

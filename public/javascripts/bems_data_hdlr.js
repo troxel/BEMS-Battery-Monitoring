@@ -338,9 +338,7 @@ function get_lgs_data(action) {
 
    if ( typeof action != 'undefined') {
       let query = new URLSearchParams(action).toString();
-      console.log(query)
       url += '?' + query
-      console.log(url)
    }
 
    var xhr = $.ajax({
@@ -360,13 +358,13 @@ function get_lgs_data(action) {
          complete: function(){
             // clear previous so don't stack'm up
             clearTimeout(timeoutId)
-            timeoutId = setTimeout(get_lgs_data,30000,action)
+            timeoutId = setTimeout(get_lgs_data,120000,action)
          },
          error: function (jqXhr, textStatus, errorMessage) {
             console.error('Ajax Error! ' + errorMessage);
             spinnerX()
          },
-         timeout:5000,
+         timeout:500000,
          dataType: 'json',        
    });
 }
