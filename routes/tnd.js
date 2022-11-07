@@ -16,7 +16,7 @@ tblLst = [{lbl:'Prop Volts',id:'volts'},{lbl:'Prop Temperature',id:'temperature'
 {lbl:'Prop Impedance',id:'impedance'},{lbl:'String Current',id:'i_prop_str'},
 {lbl:'Aux Volts',id:'volts_aux'},{lbl:'Aux Current',id:'i_aux'},{lbl:'Aux Temp',id:'temperature_aux'}]
 
-rngLst = [1,3,7,21,30]
+rngLst = [8,24,48,72,96,120]
 
 /* GET home page. */ 
 // -----------------------------------------------------------
@@ -44,7 +44,7 @@ router.get('/xhr', async function(req, res, next) {
 
   // create placemark string based on the size of the sensors requested
   let pmStr = ",??".repeat(sensors.length)
-  const sql = `select UNIX_TIMESTAMP(time) as ts,time${pmStr} from (??) WHERE time > NOW() - INTERVAL ? DAY ORDER BY time desc;`
+  const sql = `select UNIX_TIMESTAMP(time) as ts,time${pmStr} from (??) WHERE time > NOW() - INTERVAL ? HOUR ORDER BY time desc;`
   const rows = await db.querys(sql,[...sensors,tbl,rng])
 
   // rows is of format
