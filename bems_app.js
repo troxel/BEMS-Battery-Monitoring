@@ -16,6 +16,7 @@ var chgRouter   = require('./routes/chg');
 var sysRouter   = require('./routes/sys');
 var tndRouter   = require('./routes/tnd');
 var lgsRouter   = require('./routes/lgs');
+var wdsRouter   = require('./routes/wds');
 //var xhrRouter   = require('./routes/xhr');
 
 var app = express();
@@ -57,6 +58,8 @@ app.use('/sys', sysRouter);
 app.use('/chg', chgRouter);
 app.use('/tnd', tndRouter);
 app.use('/lgs', lgsRouter);
+app.use('/wds', wdsRouter);
+
 //app.use('/xhr', xhrRouter);
 
 //console.dir(xhrRouter, { depth: null })

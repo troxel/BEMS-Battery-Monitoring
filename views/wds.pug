@@ -1,0 +1,60 @@
+extends layout
+
+block content
+
+  .container
+    .row  
+      .col-3 Error/Status Words
+      hr
+  .container
+    .row
+      .col
+        - var errwdNum = [1,2,3,4,5,6,7,8] 
+          table.table.table-success.table-bordered.border-primary.caption-top
+            caption.h4 bms_scc -> error_wd[1-8]
+            tr.lead.fw-bold
+              each num in errwdNum
+                td.pt-3.pb-2.text-center(id="error_wd" + num) 1101 0010
+            tr.text-center
+              each num in errwdNum
+                td.p-1 error_wd#{num}
+    .row
+      .col
+          table.table.table-primary.table-bordered.border-primary.caption-top
+            caption.h4 SBS Error Word 
+            tr.lead.fw-bold
+              each num in errwdNum
+                td.pt-3.pb-2.text-center(id="sbs_error_wd" + num) 1101 0010
+            tr.text-center
+              each num in errwdNum
+                td.p-1 SBS#{num}
+    .row
+      .col
+          table.table.table-primary.table-bordered.border-primary.caption-top
+            caption.h4 SBS Status Word 
+            tr.lead.fw-bold
+              each num in errwdNum
+                td.pt-3.pb-2.text-center(id="sbs_status_wd" + num) 1101 0010
+            tr.text-center
+              each num in errwdNum
+                td.p-1 SBS#{num}
+    .row
+      .col
+          table.table.table-primary.table-bordered.border-primary.caption-top
+            caption.h4 SBS Alarm Word 
+            tr.lead.fw-bold
+              each num in errwdNum
+                td.pt-3.pb-2.text-center(id="sbs_alarm_wd" + num) 1101 0010
+            tr.text-center
+              each num in errwdNum
+                td.p-1 SBS#{num}
+
+  
+  script.
+    $( document ).ready( () => {
+  
+      data_xhr = get_wds_data
+      data_xhr()
+
+      document.getElementById("wds").classList.add("active");
+    })

@@ -369,6 +369,46 @@ function get_lgs_data(action) {
    });
 }
 
+// ----------------------------------------------------------
+// --------------------get lgs xhr    -----------------------
+// ----------------------------------------------------------
+function get_wds_data(action) {
+
+   let url = `${url_srv}/wds/xhr`;
+
+   if ( typeof action != 'undefined') {
+      let query = new URLSearchParams(action).toString();
+      url += '?' + query
+   }
+
+   var xhr = $.ajax({
+         url: url,
+         success: function(data){ 
+            if ( data['error'] ) {
+               this.error(this.xhr,this.textStatus,data['error'])
+               return
+            }
+         
+            spinner(data.time)
+
+            // --- display by id ----
+            let dh = dataHdlr()
+            dh.process(data)
+         },
+         complete: function(){
+            // clear previous so don't stack'm up
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(get_wds_data,3000,action)
+         },
+         error: function (jqXhr, textStatus, errorMessage) {
+            console.error('Ajax Error! ' + errorMessage);
+            spinnerX()
+         },
+         timeout:500000,
+         dataType: 'json',        
+   });
+}
+
 
 // -------------- End get functions ----------------
 

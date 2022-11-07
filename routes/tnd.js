@@ -8,7 +8,9 @@ const _ = require('lodash');
 const util = require('../services/cmn-util');
 const { xor } = require('lodash');
 
-var date = new Date();
+// Data decimation stuff
+const {largestTriangleThreeBucket} = require('d3fc-sample')
+lttb = largestTriangleThreeBucket()
 
 tblLst = [{lbl:'Prop Volts',id:'volts'},{lbl:'Prop Temperature',id:'temperature'},{lbl:'Prop Balance',id:'balance'},
 {lbl:'Prop Impedance',id:'impedance'},{lbl:'String Current',id:'i_prop_str'},
@@ -42,13 +44,38 @@ router.get('/xhr', async function(req, res, next) {
 
   // create placemark string based on the size of the sensors requested
   let pmStr = ",??".repeat(sensors.length)
-  const sql = `select time${pmStr} from (??) WHERE time > NOW() - INTERVAL ? DAY ORDER BY time desc;`
+  const sql = `select UNIX_TIMESTAMP(time) as ts,time${pmStr} from (??) WHERE time > NOW() - INTERVAL ? DAY ORDER BY time desc;`
   const rows = await db.querys(sql,[...sensors,tbl,rng])
+
+  // rows is of format
+  // [ { time: 2022-11-05T05:26:07.000Z, v1: 12.2 },
+  //   { time: 2022-11-05T05:25:49.000Z, v1: 12.9 }, ... ]
+  
+  if ( ! rows.length ) {
+    console.log("Error No Data")
+    res.json({error:"No Data"}) 
+    return
+  }
 
   // Need to reorder the data for plotting with plotly
   rtnData = {}
   rtnData.timeSeries = []
-  rtnData.time = rows[0].time
+  rtnData.time = rows[0].time    // Most recent tiem
+
+  // console.log(rtnData.timeSeries.length)
+  // rowsLess = []
+  // if ( rows.length > 70 ) {
+  //   senValLst = []
+  //   for ( sen of sensors ) {
+  //     let data = {}
+  //     lttb.x(d => d.ts).y(d => d[sen])
+  //     lttb.bucketSize(10)
+  //     console.log('>')
+  //     console.log(lttb(rows))
+  //   }  
+  // }
+  //console.log(rtnData.timeSeries.length)
+
 
   rtnData.sensors = {}
   for (sen of sensors) { rtnData.sensors[sen] = Array(rows.length) }
@@ -60,6 +87,7 @@ router.get('/xhr', async function(req, res, next) {
     }
   }
 
+  
   res.json(rtnData) 
 })
  
