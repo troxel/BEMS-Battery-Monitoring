@@ -20,20 +20,20 @@ router.get('/', function(req, res, next) {
 //--------------------------------
 router.get('/xhr', async function(req, res, next) {
 
-  let rtnObj = {}
-  rtnObj['innerHTML'] = {}
-  rtnObj['style'] = {}
- 
-  const sql = 'select * from volts order by time desc limit 1;select * from balance order by time desc limit 1;'
-  const rows = await db.querys(sql)
-
-  rtnObj['innerHTML']['volts'] = rows[0][0]
-  rtnObj['innerHTML']['balance'] = rows[1][0]
-
   let spHighVolt = req.cookies.spHighVolt
   let spLowVolt  = req.cookies.spLowVolt
   let spHighBalance  = req.cookies.spHighBalance
 
+  const sql = 'select * from volts order by time desc limit 1;select * from balance order by time desc limit 1;'
+  const rows = await db.querys(sql)
+
+  let innerHTML = {...rows[0][0], ...rows[1][0] }
+  for ( [k,v] of Object.entries(innerHTML)){ if (v==null){innerHTML[k]=''} }
+
+  let rtnObj = {}
+  rtnObj['innerHTML'] = innerHTML
+  rtnObj['style'] = {}
+ 
   var [a,b] = util.tblProc('v',rows[0][0],spHighVolt,spLowVolt)
   rtnObj['style']['voltColor'] = b
 

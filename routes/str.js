@@ -78,6 +78,9 @@ router.get('/xhr/:str', async function(req, res, next) {
   // Prepare to return Volts, Temperature, Impedance, Balance
   innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0], ...rows[3][0] }
 
+  // Need to convert nulls to empty string
+  for ( [k,v] of Object.entries(innerHTML)){ if (v==null){innerHTML[k]=''} }
+
   // spinner and data times. Impedance is only updated once a day. 
   time = rows[0][0]['time']  // spinner
   innerHTML['timeFmtR'] = new Date(rows[2][0]['time']).toLocaleString('en-US', {hour12: false})

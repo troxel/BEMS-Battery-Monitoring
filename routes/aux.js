@@ -28,10 +28,13 @@ router.get('/xhr', async function(req, res, next) {
   let spHighTempAux  = req.cookies.spHighTempAux
   let spLowTempAux  = req.cookies.spLowTempAux
 
+  let innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0] }
+  for ( [k,v] of Object.entries(innerHTML)){ if (v==null){innerHTML[k]=''} }
+
   let rtnObj = {}
-  rtnObj.innerHTML = {}
-  rtnObj.style = {}
+  rtnObj.innerHTML = innerHTML
   rtnObj.time = new Date(rows[0][0]['time']).toLocaleString('en-US', {hour12: false})
+  rtnObj.style = {}
 
   var [a,b] = util.tblProc('va',rows[0][0],spHighVoltAux,spLowVoltAux)
   rtnObj['innerHTML']['voltColor'] = a
@@ -40,14 +43,8 @@ router.get('/xhr', async function(req, res, next) {
   var [a,b] = util.tblProc('',rows[1][0],spHighTempAux,spLowTempAux)
   rtnObj['innerHTML']['tempColor'] = a
   rtnObj['style']['tempColor'] = b
-
-
-  rtnObj['innerHTML']['volts'] = rows[0][0]
-  rtnObj['innerHTML']['temperature'] = rows[1][0]
-  rtnObj['innerHTML']['i'] = rows[2][0]
-
+  
   res.json( rtnObj )
-
 })
 
 module.exports = router;
