@@ -28,11 +28,17 @@ router.get('/xhr', async function(req, res, next) {
   const rows = await db.querys(sql)
 
   let innerHTML = {...rows[0][0], ...rows[1][0] }
-  for ( [k,v] of Object.entries(innerHTML)){ if (v==null){innerHTML[k]=''} }
+  
+  // Need to convert nulls to empty string and fix float
+  for ( [k,v] of Object.entries(innerHTML)){ 
+    if (v==null){innerHTML[k]=''}
+    else { innerHTML[k]  = parseFloat(innerHTML[k]).toFixed(2) } 
+  }
 
   let rtnObj = {}
-  rtnObj['innerHTML'] = innerHTML
-  rtnObj['style'] = {}
+  rtnObj.innerHTML = innerHTML
+  rtnObj.style = {}
+  rtnObj.time = rows[0][0].time
  
   var [a,b] = util.tblProc('v',rows[0][0],spHighVolt,spLowVolt)
   rtnObj['style']['voltColor'] = b

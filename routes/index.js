@@ -46,7 +46,7 @@ router.get('/xhr', async function(req, res, next) {
   
   // Calculate string series voltage
   for (let i=0;i<4;i++){
-    htmlObj['vSumStr'+i] = _.sum(vVals.splice(0,69)).toFixed(0)
+    htmlObj['vSumStr'+i] = _.sum(vVals.splice(0,70)).toFixed(0)
   }
 
   // Populate and color max/min tables
