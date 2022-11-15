@@ -88,7 +88,8 @@ function get_str_data() {
 
          },
          complete: function(){
-            setTimeout(get_str_data,3000)
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(get_str_data,3000)
          },
          error: function (jqXhr, textStatus, errorMessage) {
             console.error('Ajax Error! ' + errorMessage);

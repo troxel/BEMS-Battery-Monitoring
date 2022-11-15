@@ -99,8 +99,7 @@ router.get('/xhr/:str', async function(req, res, next) {
   innerHTML['volt'] = a
   style['volt'] = b
 
- // [innerHTML['volt'],style['volt']] = util.tblProc('v',rows[0][0],spHighVolt,spLowVolt)
-
+  // [innerHTML['volt'],style['volt']] = util.tblProc('v',rows[0][0],spHighVolt,spLowVolt)
 
   // ---- Temperature stats -------------------
   let spHighTemp = req.cookies.spHighTemp

@@ -54,9 +54,14 @@ function tblProc(prefx,hsh,spHigh,spLow) {
 
   keys = Object.keys(hsh)
   vals = Object.values(hsh)
-  
+
+  // Ave without nulls  
+  let numNoNulls=0
+  for (i of vals) { if (i){numNoNulls++} }
+
+  console.log(numNoNulls,vals.length)
   innerHTML[prefx + 'Sum'] = _.sum(vals).toFixed(0)
-  innerHTML[prefx + 'Ave'] = (innerHTML[prefx + 'Sum']/vals.length).toFixed(1)
+  innerHTML[prefx + 'Ave'] = (innerHTML[prefx + 'Sum']/numNoNulls).toFixed(1)
 
   // Init hi/low variables
   let numHigh = 0
