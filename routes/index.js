@@ -35,8 +35,8 @@ router.get('/xhr', async function(req, res, next) {
   let htmlObj = {}
   let style = {}
 
-  let rtn = {}
-  rtn['time'] = rows[0][0]['time']  // spinner
+  let rtnObj = {}
+  rtnObj['time'] = rows[0][0]['time']  // spinner
  
   delete rows[0][0]['time']
 
@@ -95,11 +95,13 @@ router.get('/xhr', async function(req, res, next) {
   for (const k in iPropRows[0]) htmlObj[k] = iPropRows[0][k] 
 
   // Prepare to return
-  rtn['innerHTML'] = htmlObj
-  rtn['fltAlm'] = fltAlm
-  rtn['style'] = style
+  rtnObj['innerHTML'] = htmlObj
+  rtnObj['fltAlm'] = fltAlm
+  rtnObj['style'] = style
  
-  res.json(rtn) 
+  rtnObj.innerHTML.fltBang = req.hdr.fltNum ? '!' : ''
+
+  res.json(rtnObj) 
 })
 
 // handy dandy array sum function

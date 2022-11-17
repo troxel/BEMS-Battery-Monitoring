@@ -59,7 +59,6 @@ function tblProc(prefx,hsh,spHigh,spLow) {
   let numNoNulls=0
   for (i of vals) { if (i){numNoNulls++} }
 
-  console.log(numNoNulls,vals.length)
   innerHTML[prefx + 'Sum'] = _.sum(vals).toFixed(0)
   innerHTML[prefx + 'Ave'] = (innerHTML[prefx + 'Sum']/numNoNulls).toFixed(1)
 

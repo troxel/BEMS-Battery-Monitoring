@@ -56,8 +56,10 @@ router.get('/xhr', async function(req, res, next) {
     let str = Math.floor(i/7) + 1  
     let chg = (i%7) + 1
     let id = 'Chg'+chg+'Str'+str
-    rtnObj['innerHTML'][id] = sum.toFixed(1)
+    rtnObj.innerHTML[id] = sum.toFixed(1)
   } 
+
+  rtnObj.innerHTML.fltBang = req.hdr.fltNum ? '!' : ''
 
   res.json(rtnObj)
 

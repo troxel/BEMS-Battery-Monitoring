@@ -43,6 +43,8 @@ router.get('/xhr', async function(req, res, next) {
     rtnObj['innerHTML']['sbs_status_wd' + i] = bitString(1)
   }
 
+  rtnObj.innerHTML.fltBang = req.hdr.fltNum ? '!' : ''
+
   res.json(rtnObj)
 
 })

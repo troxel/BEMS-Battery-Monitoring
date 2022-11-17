@@ -44,6 +44,8 @@ router.get('/xhr', async function(req, res, next) {
   rtnObj['innerHTML']['tempColor'] = a
   rtnObj['style']['tempColor'] = b
   
+  rtnObj.innerHTML.fltBang = req.hdr.fltNum ? '!' : ''
+
   res.json( rtnObj )
 })
 

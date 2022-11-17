@@ -59,6 +59,10 @@ router.get('/xhr/:str', async function(req, res, next) {
 
   //console.log('cookies ',req.cookies)
 
+  let style = {}
+  let innerHTML = {}
+  let classList = {}
+
   // Never should happen but... 
   let str_id = req.params.str - 1
 
@@ -88,7 +92,6 @@ router.get('/xhr/:str', async function(req, res, next) {
   time = rows[0][0]['time']  // spinner
   innerHTML['timeFmtR'] = new Date(rows[2][0]['time']).toLocaleString('en-US', {hour12: false})
 
-  let style = {}
   // --------------------------------------
   // Voltage 
   // --------------------------------------
@@ -125,7 +128,16 @@ router.get('/xhr/:str', async function(req, res, next) {
   innerHTML['balance'] = a
   style['balance'] = b
 
-  res.json({time:time,innerHTML:innerHTML,style:style}) 
+  //if ( req.hdr.fltNum ) { innerHTML.fltBang = '!' }
+  //else                  { innerHTML.fltBang = '' }
+
+  innerHTML.fltBang = req.hdr.fltNum ? '!' : ''
+
+  res.json({time:time,innerHTML:innerHTML,style:style,classList:classList}) 
 })
+
+function fltBang(fltNum) {
+  return (fltNum ? '!' : '');
+}
 
 module.exports = router;

@@ -19,9 +19,28 @@ block content
               td.text-center(id=key + "_mem")= obj['mem']
               td.text-center(id=key + "_cpu")= obj['cpu']
               td.text-center
-                button.procSubmit.btn.btn-primary.btn-sm(id=key + "_btn" type="submit")  START 
+                button.procSubmit.btn.btn-primary.btn-sm(id=key + "_btn" style="width:70px;" type="submit")  START 
 
-        h5 Halt DCM 
+        h5.mt-3 Calibrate DCM 
+        table.table-bordered(style="width:100%;")
+          tr
+            th DCM
+            th
+            th 
+          tr
+            td ENV #{envHost}
+            td.text-center
+              button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="cmd_cal_exe_env") Start Cal Env
+            td.text-center
+              button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="cmd_cal_rec_env") Receive Cal Env
+          tr
+            td AUX #{auxHost}
+            td.text-center 
+              button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="cmd_cal_exe_aux") Start Cal Aux
+            td.text-center
+              button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="cmd_cal_rec_aux") Receive Cal Aux
+
+        h5.mt-5 Halt DCM 
         table.table-bordered(style="width:100%;")
           tr
             th DCM
@@ -31,12 +50,21 @@ block content
             td ENV #{envHost}
             td#envHost.text-center
             td.text-center
-              button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="halt_env") Halt
+              button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="halt_env") Halt Env
           tr
             td AUX #{auxHost}
             td#auxHost.text-center
             td.text-center 
-              button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="halt_aux") Halt
+              button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="halt_aux") Halt Aux
+
+        h5.mt-5 Halt BEMS Supervisory Server (this one)
+        table.table-bordered(style="width:100%;")
+          tr
+            td BEMS Supervisory Server
+            td.text-center
+              button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="halt_supcomp") Halt SupComp
+        p.text-danger.fs-7.mt-0.mb-0 Caution: Requires powercycle to restart
+
       .col-7
         h4 Top
         pre
@@ -46,14 +74,7 @@ block content
         pre
           #dfBr
 
-        
-    .row
-      .col
-        hr
-        h4 Log
-        pre
-          #logBr
-  
+
   style.
     
 

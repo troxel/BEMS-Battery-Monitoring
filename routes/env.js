@@ -65,7 +65,9 @@ router.get('/xhr', async function(req, res, next) {
         rtnObj['style'][key] = {backgroundColor:'red'}
       }
   }
-  
+
+  rtnObj.innerHTML.fltBang = req.hdr.fltNum ? '!' : ''
+
   res.json(rtnObj)
 })
 

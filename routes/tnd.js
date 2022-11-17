@@ -32,7 +32,7 @@ router.get('/', function(req, res, next) {
 
 // -----------------------------------------------------------
 // -----------------------------------------------------------
-/* GET str page. */ 
+/* GET data */ 
 router.get('/xhr', async function(req, res, next) {
 
   if (! req.query ) { next }

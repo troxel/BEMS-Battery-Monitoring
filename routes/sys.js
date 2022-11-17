@@ -5,11 +5,12 @@ var router = express.Router();
 const request = require('request');
 
 var cmdObj = {}
-cmdObj['bems_main']  = {lbl:'Bems_Main',cmd:'bems_main',regexp:RegExp(/bems_main/)}
-cmdObj['bems_gui']   = {lbl:'Bems_Gui',cmd:'bems_gui',regexp:RegExp(/bems_gui/)}
-cmdObj['bems_aux']  = {lbl:'Bems_Aux',cmd:'bems_aux',regexp:RegExp(/bems_aux/)}
-cmdObj['bems_env']  = {lbl:'Bems_Env',cmd:'bems_env',regexp:RegExp(/bems_env/)}
-cmdObj['sbs_dcm']  = {lbl:'Bems_SBS',cmd:'sbs_dcm',regexp:RegExp(/sbs/)}
+cmdObj['bems_main']  = {lbl:'Bems Main',cmd:'bems_main',regexp:RegExp(/\/bems_main/)}
+cmdObj['bems_gui']   = {lbl:'Bems Gui',cmd:'bems_gui',regexp:RegExp(/\/bems_gui/)}
+cmdObj['bems_aux']  = {lbl:'Bems Aux',cmd:'bems_aux',regexp:RegExp(/\/bems_aux/)}
+cmdObj['bems_env']  = {lbl:'Bems Env',cmd:'bems_env',regexp:RegExp(/\/bems_env/)}
+cmdObj['bems_wmn']  = {lbl:'Bems Wmn',cmd:'bems_wmn',regexp:RegExp(/\/bems_wmn/)}
+cmdObj['bems_flt']  = {lbl:'Bems Flt',cmd:'bems_flt',regexp:RegExp(/\/bems_flt/)}
 
 // Get DCM hosts names from env which are set in the unit file
 let dcm = {}
@@ -41,6 +42,7 @@ router.get('/xhr', async function(req, res, next) {
   if ( req.query.id ) {
     // console.log('id -> ',req.query.id,"cmd ->",req.query.cmd)
 
+    // --------- Halt Commands ------------
     if ( req.query.id === 'halt_env' ) {
 
       request('http://' + dcm.envHost + '/halt', function (error, response, body) {
@@ -58,17 +60,36 @@ router.get('/xhr', async function(req, res, next) {
           console.log(`Halt ${dcm.auxHost} statusCode: `, response && response.statusCode); // Print the response status code if a response was received
         }
       })
-    } 
-    else if ( req.query.cmd === 'RESTART' ) {
-      if (req.query.id === 'bems_gui_btn') {
-        exec("systemctl restart bems_gui",{timeout:2000,encoding:'utf8'})
-        cmdObj['bems_gui']['skip'] = true // probably won't have an effect due to stopping
-        console.log("Restarted bems_gui bye bye")
-      }
-      // Add other restarts ... be careful with input. 
-
     }
-  }
+    else if ( req.query.id === 'halt_supcomp' ) {
+      exec("systemctl halt")  // party is over
+    } 
+    // --------- Start/Restart Commands ------------
+    else if ( (req.query.cmd === 'RESTART') || req.query.cmd === 'START' ) {
+      let key = /(bems_\w+)_btn/.exec(req.query.id)[1]
+      if ( cmdObj[key] ) {
+        let cmd = req.query.cmd.toLowerCase()
+        exec(`systemctl ${cmd} ${key}`,{timeout:2000,encoding:'utf8'})  // <- Right here is where it happens
+        console.log(`systemctl ${cmd} ${key}`)
+      }
+      else{
+        console.log(`${key} not in Command Object`)
+      }
+    }
+    // --------- Cal Commands ------------
+    else if ( req.query.id == 'cmd_cal_exe_env' ) {
+      console.log("/cmd_cal_exe",'env')   
+    }
+    else if ( req.query.id == 'cmd_cal_exe_aux' ) {
+      console.log("/cmd_cal_exe",'aux')   
+    }    
+    else if ( req.query.id == 'cmd_cal_rec_env' ) {
+      console.log("/cmd_cal_rec",'env')   
+    }
+    else if ( req.query.id == 'cmd_cal_rec_aux' ) {
+      console.log("/cmd_cal_rec",'aux')   
+    }
+  } // end query 
 
   for (const key in cmdObj) {
     rtnObj['innerHTML'][key + '_pid'] = '--'
@@ -85,10 +106,7 @@ router.get('/xhr', async function(req, res, next) {
   }
  
   try {
-    var stdout = execSync("journalctl -n 30 -r --no-pager",{timeout:2000,encoding:'utf8'})
-    let logLst = stdout.split("\n")
-    rtnObj['innerHTML']['logBr'] = logLst.join("<br>")
-
+   
     // -b batch mode necessary
     stdout = execSync("top -n 1 -b",{timeout:2000,encoding:'utf8'})
     let topLst = stdout.split("\n").slice(0,4)
@@ -112,17 +130,13 @@ router.get('/xhr', async function(req, res, next) {
 
       for (key in cmdObj) {
 
-        if ( cmdObj[key]['skip']) {
-          console.log("skipping",cmdObj)
-          continue;
-        } 
-
-        if ( rtnObj['innerHTML'].hasOwnProperty(key + '_fnd') ) {
+          if ( rtnObj['innerHTML'].hasOwnProperty(key + '_fnd') ) {
           rtnObj['innerHTML'][key + '_fnd'] =+ 1  // multiple processes bad :(  need to set alert
           continue; 
         }  
 
         let hit = colLst[3].match(cmdObj[key]['regexp'])
+
         if ( hit ) {
           rtnObj['innerHTML'][key + '_pid'] = colLst[0]
           rtnObj['innerHTML'][key + '_cpu'] = colLst[1]
@@ -138,8 +152,7 @@ router.get('/xhr', async function(req, res, next) {
       console.log("Error in xhr sys ",error);
   }
 
-  rtnObj['innerHTML']['spn'] = req.spn   // still used?
-  rtnObj['innerHTML']['ts'] = req.ts
+  rtnObj.innerHTML.fltBang = req.hdr.fltNum ? '!' : ''
   rtnObj.time = new Date()
 
   res.json(rtnObj) 

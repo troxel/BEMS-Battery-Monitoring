@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
+const db = require('../services/mysqldb');
+const config = require('../config');
+
 const fs = require('fs')
 
 // Logs and filespecs 
@@ -61,6 +64,12 @@ router.get('/xhr', async function(req, res, next) {
         console.log("Error in xhr lgs ",error);
     }
   }
+
+  const sql = 'select time from volts order by time desc limit 1'
+  const rows = await db.querys(sql)
+
+  rtnObj.time = rows[0].time
+  rtnObj.innerHTML.fltBang = req.hdr.fltNum ? '!' : ''
 
   res.json(rtnObj) 
 
