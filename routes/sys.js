@@ -4,6 +4,9 @@ const { resolve } = require('path');
 var router = express.Router();
 const request = require('request');
 
+const db = require('../services/mysqldb');
+const config = require('../config');
+
 var cmdObj = {}
 cmdObj['bems_main']  = {lbl:'Bems Main',cmd:'bems_main',regexp:RegExp(/\/bems_main/)}
 cmdObj['bems_gui']   = {lbl:'Bems Gui',cmd:'bems_gui',regexp:RegExp(/\/bems_gui/)}
@@ -35,12 +38,28 @@ const ping = require('ping');
 router.get('/xhr', async function(req, res, next) {
 
   let rtnObj = {}
-  rtnObj['innerHTML'] = {}
-  rtnObj['classList'] = {}
+  rtnObj.innerHTML = {}
+  rtnObj.classList = {}
+  rtnObj.style = {}
+
+  const sql = 'select time from volts_aux order by time desc limit 1;\
+    select time from env order by time desc limit 1;'
+
+  const rows = await db.querys(sql)
+
+  const auxDate = new Date(rows[0][0].time)
+  const envDate = new Date(rows[1][0].time)
+  const nowDate = Date.now()
+
+  rtnObj.style['auxTime'] = rtnObj.style['envTime'] = {backgroundColor:'#1E9E1E'}
+  if ( (nowDate - auxDate) > 20000 ) rtnObj.style['auxTime'] = {backgroundColor:'red'}
+  if ( (nowDate - envDate) > 20000 ) rtnObj.style['envTime'] = {backgroundColor:'red'}
+    
+  rtnObj.innerHTML['auxTime'] = auxDate.toLocaleTimeString()
+  rtnObj.innerHTML['envTime'] = envDate.toLocaleTimeString()
 
   // ---- commands -------------------
   if ( req.query.id ) {
-    // console.log('id -> ',req.query.id,"cmd ->",req.query.cmd)
 
     // --------- Halt Commands ------------
     if ( req.query.id === 'halt_env' ) {

@@ -75,16 +75,17 @@ router.get('/xhr/:str', async function(req, res, next) {
   const sql = `select time,${str_select['volts'][str_id]} from volts order by time desc limit 1;\
   select time,${str_select['temperature'][str_id]} from temperature order by time desc limit 1;\
   select time,${str_select['impedance'][str_id]} from impedance order by time desc limit 1;\
-  select time,${str_select['balance'][str_id]} from balance order by time desc limit 1;`;
+  select time,${str_select['balance'][str_id]} from balance order by time desc limit 1;\
+  select * from i_prop_str order by time desc limit 1;`
 
   const rows = await db.querys(sql)
 
   // Prepare to return Volts, Temperature, Impedance, Balance
-  innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0], ...rows[3][0] }
+  innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0], ...rows[3][0], ...rows[4][0] }
 
   // Need to convert nulls to empty string and fix float
   for ( [k,v] of Object.entries(innerHTML)){ 
-    if (v==null){innerHTML[k]=''}
+    if (v==null){innerHTML[k]='&nbsp;'}
     else { innerHTML[k]  = parseFloat(innerHTML[k]).toFixed(2) } 
   }
 

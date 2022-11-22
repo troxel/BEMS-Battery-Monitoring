@@ -18,7 +18,7 @@ block content
             td#vSumStr1 
             td#vSumStr2 
             td#vSumStr3 
-            td#vSumAux
+            td#vaSum
           tr
             th Current      
             td#i_str0 
@@ -29,25 +29,25 @@ block content
     section.row
       .col-3 
         table.maxmin.table-bordered.caption-top.shadow.strrow()
-          caption= "Low Voltages"
+          caption Low Prop Voltage
           th Tray 
           th Volts
           - var row = 0
           while (row < 10)
             tr(id="vMinRow" + row)
-              td(id="vMinKey" + row)
+              td(id="vMinTray" + row)
               td(id="vMinVal" + row)
               - row++
 
         table.maxmin.table-bordered.caption-top.shadow.mt-2.strrow()
-          caption Maximum Temperature
+          caption Maximum Prop Temp
           th Tray 
           th °F
 
           - var row = 0
           while (row < 10)
             tr(id="tMaxRow" + row)
-              td(id="tMaxKey" + row)
+              td(id="tMaxTray" + row)
               td(id="tMaxVal" + row) 
               - row++
       .col

@@ -40,20 +40,23 @@ block content
             td.text-center
               button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="cmd_cal_rec_aux") Receive Cal Aux
 
-        h5.mt-5 Halt DCM 
+        h5.mt-5 DCM Status and Halt 
         table.table-bordered(style="width:100%;")
           tr
             th DCM
             th Status
+            th Last update
             th Halt
           tr
             td ENV #{envHost}
             td#envHost.text-center
+            td#envTime.text-center
             td.text-center
               button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="halt_env") Halt Env
           tr
             td AUX #{auxHost}
             td#auxHost.text-center
+            td#auxTime.text-center
             td.text-center 
               button.procSubmit.btn.btn-primary.btn-sm(type="submit" style="margin:2px;" id="halt_aux") Halt Aux
 

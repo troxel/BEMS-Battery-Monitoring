@@ -20,6 +20,7 @@ router.get('/', function(req, res, next) {
 //--------------------------------
 router.get('/xhr', async function(req, res, next) {
 
+  // volt,temperature_aux,i_aux
   const sql = 'select * from volts_aux order by time desc limit 1;select * from temperature_aux order by time desc limit 1;select * from i_aux order by time desc limit 1;'
   const rows = await db.querys(sql)
 
@@ -29,7 +30,7 @@ router.get('/xhr', async function(req, res, next) {
   let spLowTempAux  = req.cookies.spLowTempAux
 
   let innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0] }
-  for ( [k,v] of Object.entries(innerHTML)){ if (v==null){innerHTML[k]=''} }
+  for ( [k,v] of Object.entries(innerHTML)){ if (v==null){innerHTML[k]='&nbsp;'} }
 
   let rtnObj = {}
   rtnObj.innerHTML = innerHTML

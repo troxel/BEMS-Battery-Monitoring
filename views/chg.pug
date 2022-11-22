@@ -43,7 +43,13 @@ block content
                     - var col_start = row_cnt * innerLoopStep + tbl_cnt * outerLoopStep
                     while (col_cnt < cols)
                       - cell_id = col_start + col_cnt + 1
-                      td(id=prefix + cell_id, title=prefix + cell_id) #{prefix}#{cell_id}
+
+                      - subcell_id = cell_id % 70
+                      - subcell_id = (subcell_id>10) ? subcell_id : "0" + subcell_id
+                      - tray_id = (Math.trunc(cell_id / 70) + 1)
+                      - ttl = 'tray' + tray_id + '-' + subcell_id
+
+                      td(id=prefix + cell_id, title=ttl) #{prefix}#{cell_id}
                       - col_cnt++
                     - row_cnt++
               - tbl_cnt++

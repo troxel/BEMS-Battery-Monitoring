@@ -21,8 +21,12 @@ router.get('/', function(req, res, next) {
 // -----------------------------------------------------------
 router.get('/xhr', async function(req, res, next) {
 
-  // Get last insert
-  let sql = `select * from volts order by time desc limit 1;select * from temperature order by time desc limit 1;select * from impedance order by time desc limit 1`;
+  // volts,temperature,impedance,i_aux,volts_aux
+  let sql = `select * from volts order by time desc limit 1;
+             select * from temperature order by time desc limit 1;
+             select * from impedance order by time desc limit 1;
+             select * from i_aux order by time desc limit 1;
+             select * from volts_aux order by time desc limit 1`;
   
   var rows
   try {
@@ -32,8 +36,11 @@ router.get('/xhr', async function(req, res, next) {
   } 
 
   // Return object
-  let htmlObj = {}
+  let innerHTML = {}
   let style = {}
+
+  innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0], ...rows[3][0], ...rows[4][0]  }
+
 
   let rtnObj = {}
   rtnObj['time'] = rows[0][0]['time']  // spinner
@@ -46,8 +53,12 @@ router.get('/xhr', async function(req, res, next) {
   
   // Calculate string series voltage
   for (let i=0;i<4;i++){
-    htmlObj['vSumStr'+i] = _.sum(vVals.splice(0,70)).toFixed(0)
+    innerHTML['vSumStr'+i] = _.sum(vVals.splice(0,70)).toFixed(0)
   }
+
+  // Calculate aux voltage
+  delete rows[4][0].time
+  innerHTML['vaSum'] = _.sum(Object.values(rows[4][0])).toFixed(0)
 
   // Populate and color max/min tables
   let spHighVolt = req.cookies.spHighVolt
@@ -55,7 +66,7 @@ router.get('/xhr', async function(req, res, next) {
   let spHighTemp  = req.cookies.spHighTemp
 
   var [a,b] = util.tblProc('v',rows[0][0],spHighVolt,spLowVolt)
-  htmlObj['voltinner'] = a
+  innerHTML['voltinner'] = a
   style['voltColor'] = b
 
   //var [a,b] = util.tblProc('b',rows[1][0],spHighBalance,0)
@@ -63,8 +74,10 @@ router.get('/xhr', async function(req, res, next) {
 
   // Temperature stats
   var [a,b] = util.tblProc('t',rows[1][0],spHighTemp,0)
-  htmlObj['tempinner'] = a
+  innerHTML['tempinner'] = a
   style['tempColor'] = b
+
+//console.log(a,b)
 
   // tKeys = Object.keys(rows[1][0])
   // tVals = Object.values(rows[1][0])
@@ -72,9 +85,9 @@ router.get('/xhr', async function(req, res, next) {
   // delete tHash['time']
 
   // // Note tAve is not used in the template... 
-  // htmlObj['tAve'] = (_.sum(tVals)/tVals.length).toFixed(1)
+  // innerHTML['tAve'] = (_.sum(tVals)/tVals.length).toFixed(1)
 
-  // htmlObj['tminmax'] = util.maxmin(vHash,'t')
+  // innerHTML['tminmax'] = util.maxmin(vHash,'t')
 
   // Faults and Alarms ....
   if ( req.query.clearFaults ){
@@ -92,10 +105,10 @@ router.get('/xhr', async function(req, res, next) {
   
   let iPropRows = await db.querys(sql)
 
-  for (const k in iPropRows[0]) htmlObj[k] = iPropRows[0][k] 
+  for (const k in iPropRows[0]) innerHTML[k] = iPropRows[0][k] 
 
   // Prepare to return
-  rtnObj['innerHTML'] = htmlObj
+  rtnObj['innerHTML'] = innerHTML
   rtnObj['fltAlm'] = fltAlm
   rtnObj['style'] = style
  

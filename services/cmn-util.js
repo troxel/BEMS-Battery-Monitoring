@@ -104,16 +104,29 @@ function tblProc(prefx,hsh,spHigh,spLow) {
     
     if (! ident) continue; 
 
-    let tray = reTray.exec(ident)[0]
+    let cell = reTray.exec(ident)[0]
 
-    innerHTML[prefx + "MinKey" + i] = tray
+    // tray for prop / cell for aux   
+    let subcell = cell % 70
+
+    // create tray identifier and format
+    subcell = (subcell>10) ? subcell : '0' + subcell
+    let tray = 'tray' + (Math.trunc(cell / 70) + 1) + '-' + subcell
+
+    innerHTML[prefx + "MinTray" + i] = tray
+    innerHTML[prefx + "MinKey" + i] = cell
     innerHTML[prefx + "MinVal" + i] = hsh[ident]
     style[prefx + "MinRow" + i] = style[ident]   
 
     let offset = endInx - i; 
-    id = reTray.exec(keysNoNull[offset])[0]
+    cell = reTray.exec(keysNoNull[offset])[0]
 
-    innerHTML[prefx + "MaxKey" + i] = tray
+    subcell = cell % 70
+    subcell = (subcell>10) ? subcell : "0" + subcell
+    tray = 'tray' + (Math.trunc(cell / 70) + 1) + '-' + subcell
+
+    innerHTML[prefx + "MaxTray" + i] = tray
+    innerHTML[prefx + "MaxKey" + i] = cell
     innerHTML[prefx + "MaxVal" + i] = hsh[keysNoNull[offset]]
     style[prefx + "MaxRow" + i] = style[keysNoNull[offset]]   
   }
