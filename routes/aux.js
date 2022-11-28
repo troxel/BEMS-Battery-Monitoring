@@ -29,14 +29,26 @@ router.get('/xhr', async function(req, res, next) {
   let spHighTempAux  = req.cookies.spHighTempAux
   let spLowTempAux  = req.cookies.spLowTempAux
 
-  let innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0] }
-  for ( [k,v] of Object.entries(innerHTML)){ if (v==null){innerHTML[k]='&nbsp;'} }
-
   let rtnObj = {}
-  rtnObj.innerHTML = innerHTML
-  rtnObj.time = new Date(rows[0][0]['time']).toLocaleString('en-US', {hour12: false})
   rtnObj.style = {}
+  rtnObj.innerHTML = {}
+  rtnObj.time = new Date(rows[0][0]['time']).toLocaleString('en-US', {hour12: false})
 
+  let innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0] }
+  for ( [k,v] of Object.entries(innerHTML)){ 
+    if (v==null) { 
+      innerHTML[k]='&nbsp;' 
+    }
+    else if ( typeof(v) == 'number' ) {
+      innerHTML[k] = v.toFixed(2)
+    }  
+  }
+
+  // check with lsv to find out what fix is appropiate
+  innerHTML.i_aux = (innerHTML.i_aux * 1).toFixed(1)
+
+  rtnObj.innerHTML = innerHTML
+  
   var [a,b] = util.tblProc('va',rows[0][0],spHighVoltAux,spLowVoltAux)
   rtnObj['innerHTML']['voltColor'] = a
   rtnObj['style']['voltColor'] = b

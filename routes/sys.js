@@ -121,9 +121,10 @@ router.get('/xhr', async function(req, res, next) {
   // --- Ping DCMs -----------
   for (const key in dcm) {
     let response = await ping.promise.probe(dcm[key])
-    rtnObj['innerHTML'][key] = response.alive ? 'UP' : 'DOWN'
+    rtnObj.innerHTML[key] = response.alive ? 'UP' : 'DOWN'
+    rtnObj.style[key] = response.alive ? {backgroundColor:'#1E9E1E'} : {backgroundColor:'red'}
   }
- 
+
   try {
    
     // -b batch mode necessary
@@ -162,7 +163,7 @@ router.get('/xhr', async function(req, res, next) {
           rtnObj['innerHTML'][key + '_mem'] = (colLst[2]/1000).toFixed(0) + 'kb' // in kb
           rtnObj['innerHTML'][key + '_btn'] = 'RESTART'
           rtnObj['innerHTML'][key + '_fnd'] = 1 // used to continue above as we found our process
-          rtnObj['classList'][key] = {add:'text-success'}
+          rtnObj['classList'][key] = {add:'text-success',remove:'text-danger'}
         }
       }
     }

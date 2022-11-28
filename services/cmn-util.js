@@ -115,7 +115,7 @@ function tblProc(prefx,hsh,spHigh,spLow) {
 
     innerHTML[prefx + "MinTray" + i] = tray
     innerHTML[prefx + "MinKey" + i] = cell
-    innerHTML[prefx + "MinVal" + i] = hsh[ident]
+    innerHTML[prefx + "MinVal" + i] = hsh[ident].toFixed(2)
     style[prefx + "MinRow" + i] = style[ident]   
 
     let offset = endInx - i; 
@@ -127,7 +127,7 @@ function tblProc(prefx,hsh,spHigh,spLow) {
 
     innerHTML[prefx + "MaxTray" + i] = tray
     innerHTML[prefx + "MaxKey" + i] = cell
-    innerHTML[prefx + "MaxVal" + i] = hsh[keysNoNull[offset]]
+    innerHTML[prefx + "MaxVal" + i] = hsh[keysNoNull[offset]].toFixed(2)
     style[prefx + "MaxRow" + i] = style[keysNoNull[offset]]   
   }
 

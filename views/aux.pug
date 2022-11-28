@@ -4,19 +4,18 @@ block content
 
   input#str_id(type="hidden",value=str_id)
   .container
-    .row  
-      .col-3.lead String Voltage: 
-        span#vaSum(style="font-weight:700;")
-        span.ms-1 v
-      .col-4.lead Cell Voltage Ave: 
-        span#vaAve(style="font-weight:700;")
-        span.ms-1 v
-      hr
+    .row
+      .col.h5 Aux String #{str_lbl} : 
+        span#vaSum.ms-2.fw-bolder
+        span.ms-1 volts 
+        span#i_aux.ms-4.fw-bolder
+        span.ms-1 amps
+      
   .container
 
     .row.border.border-primary.strrow.ms-1()
       .col-2
-        table.maxmin(class="table-bordered caption-top")
+        table.maxmin.table-bordered.caption-top.shadow
           caption= "Maximum Voltages"
           th Cell  
           th Volts
@@ -27,14 +26,14 @@ block content
               td(id="vaMaxKey" + row)
               td(id="vaMaxVal" + row) &nbsp;
               - row++
-        table.maxminnum
+        table
           tr
             td High Volt Cells
             td#vaNumHigh
             td 
 
       .col-3
-        table.maxmin.table-bordered.caption-top()
+        table.maxmin.table-bordered.caption-top.ms-2.shadow
           caption= "Minimum Voltages"
           th Tray 
           th Volts
@@ -45,14 +44,14 @@ block content
               td(id="vaMinKey" + row)
               td(id="vaMinVal" + row) &nbsp;
               - row++
-        table.maxminnum
+        table
           tr
             td Low Voltage Cells
             td#vaNumLow 
             td
 
       .col-7
-        table(class="table-bordered caption-top traytbl", style="width:400px")
+        table.table-bordered.caption-top.traytbl.shadow(style="width:400px")
           caption Aux Cell Voltages
           - var cols = 10
           - var rows = 19
@@ -69,24 +68,20 @@ block content
                   td
         include includes/spVoltsAux.pug
 
-    .row.border.border-primary.strrow.ms-1.mt-2()
-      .col-4
-        .caption Aux Current amps
-        table(class="table-bordered caption-top")
-            tr
-              td.cfs(id="i_aux", title="i_aux", width="40px", style="background-color:white;")  1
-      .col-3
+    .row.border.border-primary.strrow.ms-1.mt-2.shadow()
+      .col-1
+      .col-5
         .caption Aux Cell Temperatures °F
-        table(class="table-bordered caption-top")
-            tr
+        table.table.table-bordered.caption-top.shadow
+            tr.text-end
               td.cfs(id="aux_cell_temp_1", title="aux_cell_temp_1", width="40px")  1
               td.cfs(id="aux_cell_temp_2", title="aux_cell_temp_2", width="40px")  2
               td.cfs(id="aux_cell_temp_3", title="aux_cell_temp_3", width="40px")  3
               td.cfs(id="aux_cell_temp_4", title="aux_cell_temp_4", width="40px")  4
-      .col-3 
+      .col-3.ms-4
         .caption Aux Ambient Temperatures °F
-        table.mb-1(class="table-bordered caption-top")
-            tr
+        table.mb-1.table.table-bordered.caption-top.shadow
+            tr.text-end
               td.cfs(id="aux_amb_temp_1", title="aux_amb_temp_1", width="40px")  1
               td.cfs(id="aux_amb_temp_2", title="aux_amb_temp_2", width="40px")  2
     

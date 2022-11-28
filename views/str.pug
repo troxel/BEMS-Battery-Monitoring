@@ -5,16 +5,16 @@ block content
   input#str_id(type="hidden",value=str_id)
   .container
     .row  
-      .col.h5 String #{str_lbl} : Voltage 
-        span#vSum 
-        span.ms-3 Current
-        span.ms-2(id="i_str" + str_id)
-      hr
+      .col.h5 String #{str_lbl} : 
+        span#vSum.ms-2.fw-bolder
+        span.ms-1 volts 
+        span.ms-4.fw-bolder(id="i_str" + str_id)
+        span.ms-1 amps
   .container
 
     .row.border.border-primary.strrow.ms-1.shadow()
       .col-2
-        table.maxminVolt.maxmin(class="table-bordered caption-top")
+        table.maxmin.table-bordered.caption-top
           caption Max Voltages
           th Tray 
           th Volts
@@ -32,7 +32,7 @@ block content
             td 
 
       .col-3
-        table.maxminVolt.maxmin.table-bordered.caption-top()
+        table.maxmin.table-bordered.caption-top.ms-2()
           caption Min Voltages
           th Tray 
           th Volts
@@ -176,13 +176,13 @@ block content
           - var row_cnt = 0
           - var inx_cnt = 1
           - var str_num = str_id + 1
-          - var ttl_str = "r"+str_num+"-"
+          - var ttl_str = "tray"+str_num+"-"
           while (row_cnt < rows)
             tr
               - var col_cnt = 0
               while (col_cnt < cols)
                 - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="tray" +cell_cnt, title=ttl_str+inx_cnt) &nbsp;
+                td.cfs(id="r" +cell_cnt, title=ttl_str+inx_cnt) &nbsp;
                 - col_cnt++
                 - inx_cnt++
               - offset_cell = offset_cell + cols

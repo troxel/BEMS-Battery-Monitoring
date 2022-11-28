@@ -33,7 +33,7 @@ router.get('/xhr', async function(req, res, next) {
 
   // Convert to temperature
   for ( k of  ['batt_temp','ee_temp','machine_temp_1','machine_temp_2'] ) {
-    rows[0][0][k] = rows[0][0][k] * 50.0
+    rows[0][0][k] = (rows[0][0][k] * 50.0).toFixed(1)
   }
 
   rtnObj.innerHTML.env = rows[0][0]
