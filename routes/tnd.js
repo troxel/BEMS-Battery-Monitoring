@@ -8,6 +8,8 @@ const _ = require('lodash');
 const util = require('../services/cmn-util');
 const { xor } = require('lodash');
 
+const dr = require('datareduce')
+
 // Data decimation stuff
 const {largestTriangleThreeBucket} = require('d3fc-sample')
 lttb = largestTriangleThreeBucket()
@@ -16,7 +18,7 @@ tblLst = [{lbl:'Prop Volts',id:'volts'},{lbl:'Prop Temperature',id:'temperature'
 {lbl:'Prop Impedance',id:'impedance'},{lbl:'String Current',id:'i_prop_str'},
 {lbl:'Aux Volts',id:'volts_aux'},{lbl:'Aux Current',id:'i_aux'},{lbl:'Aux Temp',id:'temperature_aux'}]
 
-rngLst = [8,24,48,72,96,120]
+rngLst = [1,4,8,24,48,72,96,120]
 
 /* GET home page. */ 
 // -----------------------------------------------------------
@@ -32,12 +34,12 @@ router.get('/', function(req, res, next) {
 
 // -----------------------------------------------------------
 // -----------------------------------------------------------
-/* GET data */ 
+/* GET str page. */ 
 router.get('/xhr', async function(req, res, next) {
 
   if (! req.query ) { next }
 
-  console.log(req.query)
+  //console.log(req.query)
   let tbl    = req.query.tbl
   let sensors = req.query.sensor.split(',')
   let rng     = req.query.rng || 1
@@ -58,9 +60,7 @@ router.get('/xhr', async function(req, res, next) {
   }
 
   // Need to reorder the data for plotting with plotly
-  rtnData = {}
-  rtnData.timeSeries = []
-  rtnData.time = rows[0].time    // Most recent tiem
+ 
 
   // console.log(rtnData.timeSeries.length)
   // rowsLess = []
@@ -76,7 +76,9 @@ router.get('/xhr', async function(req, res, next) {
   // }
   //console.log(rtnData.timeSeries.length)
 
-
+  rtnData = {}
+  rtnData.timeSeries = []
+  rtnData.time = rows[0].time    // Most recent time
   rtnData.sensors = {}
   for (sen of sensors) { rtnData.sensors[sen] = Array(rows.length) }
 
@@ -87,7 +89,17 @@ router.get('/xhr', async function(req, res, next) {
     }
   }
 
-  
+  if ( rows.length > 1100 ){
+    senDr = {}
+    for ( sen of sensors ) {
+      // Index 0 = time, 1 = value
+      senDr[sen] = dr.lt3b(rtnData.timeSeries,rtnData.sensors[sen],900)
+    }
+    rtnData['dr'] = senDr
+    delete rtnData.sensors
+    delete rtnData.timeSeries
+  }  
+
   res.json(rtnData) 
 })
  

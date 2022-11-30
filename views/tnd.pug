@@ -135,17 +135,35 @@ block content
       function plotTnd(data) {
       
         let traceLst = []
-        for (const [sen, dataSen] of Object.entries(data.sensors)) {
+        if (data.dr) {
+          
+          for (const [sen, dataLst] of Object.entries(data.dr)) {
 
-          traceLst.push( {
-            x: data.timeSeries,
-            y: dataSen,
-            name: sen,
-            mode: 'lines+markers',
-            type: 'scatter',
-          })
+            traceLst.push( {
+              x: dataLst[0],
+              y: dataLst[1],
+              name: sen + (' (r)'),
+              mode: 'lines+markers',
+              type: 'scatter',
+            })
+          }
+
+        } 
+        else {
+          
+          for (const [sen, dataSen] of Object.entries(data.sensors)) {
+
+            traceLst.push( {
+              x: data.timeSeries,
+              y: dataSen,
+              name: sen,
+              mode: 'lines+markers',
+              type: 'scatter',
+            })
+          }
+
         }
-        
+
         var layout = {
           showlegend: true,
           xaxis: {
