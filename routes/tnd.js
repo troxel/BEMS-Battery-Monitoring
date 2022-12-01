@@ -14,11 +14,11 @@ const dr = require('datareduce')
 const {largestTriangleThreeBucket} = require('d3fc-sample')
 lttb = largestTriangleThreeBucket()
 
-tblLst = [{lbl:'Prop Volts',id:'volts'},{lbl:'Prop Temperature',id:'temperature'},{lbl:'Prop Balance',id:'balance'},
-{lbl:'Prop Impedance',id:'impedance'},{lbl:'String Current',id:'i_prop_str'},
-{lbl:'Aux Volts',id:'volts_aux'},{lbl:'Aux Current',id:'i_aux'},{lbl:'Aux Temp',id:'temperature_aux'}]
+tblObj = {volts:'Prop Volts',temperature:'Prop Temperature', balance:'Prop Balance',
+impedance:'Prop Impedance', i_prop_str:'String Current', volts_aux:'Aux Volts', i_aux:'Aux Current',
+temperature_aux:'Aux Temp',env:'Environmental'}
 
-rngLst = [1,4,8,24,48,72,96,120]
+rngLst = [2,4,8,24,48,72,96,120]
 
 /* GET home page. */ 
 // -----------------------------------------------------------
@@ -29,7 +29,7 @@ router.get('/', function(req, res, next) {
     selectVolts.push({id:'v'+j,name:'v'+j})
   }
 
-  res.render('tnd', {tblLst:tblLst,rngLst,rngLst});
+  res.render('tnd', {tblObj:tblObj,rngLst,rngLst});
 });
 
 // -----------------------------------------------------------
@@ -44,6 +44,14 @@ router.get('/xhr', async function(req, res, next) {
   let sensors = req.query.sensor.split(',')
   let rng     = req.query.rng || 1
 
+  rtnData = {}
+  rtnData.innerHTML = {}
+
+  if ( ! tblObj[tbl] ) { 
+    rtnData.error = "No Table"
+    return res.json(rtnData)  
+  }
+
   // create placemark string based on the size of the sensors requested
   let pmStr = ",??".repeat(sensors.length)
   const sql = `select UNIX_TIMESTAMP(time) as ts,time${pmStr} from (??) WHERE time > NOW() - INTERVAL ? HOUR ORDER BY time desc;`
@@ -55,28 +63,11 @@ router.get('/xhr', async function(req, res, next) {
   
   if ( ! rows.length ) {
     console.log("Error No Data")
-    res.json({error:"No Data"}) 
-    return
+    console.log(tbl,sensors,rng)
+    return res.json(rtnData)  
   }
 
   // Need to reorder the data for plotting with plotly
- 
-
-  // console.log(rtnData.timeSeries.length)
-  // rowsLess = []
-  // if ( rows.length > 70 ) {
-  //   senValLst = []
-  //   for ( sen of sensors ) {
-  //     let data = {}
-  //     lttb.x(d => d.ts).y(d => d[sen])
-  //     lttb.bucketSize(10)
-  //     console.log('>')
-  //     console.log(lttb(rows))
-  //   }  
-  // }
-  //console.log(rtnData.timeSeries.length)
-
-  rtnData = {}
   rtnData.timeSeries = []
   rtnData.time = rows[0].time    // Most recent time
   rtnData.sensors = {}

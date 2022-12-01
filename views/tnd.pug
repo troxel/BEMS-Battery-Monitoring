@@ -17,8 +17,8 @@ block content
       .col-3
         select#selTbl1.select.form-select.mt-2.mb-2()
           option() Select Data Source 1
-          each opt in tblLst
-            option(value=opt.id) #{opt.lbl}
+          each val, key in tblObj
+            option(value=key) #{val}
       .col-3
         select#selSensor1.select.form-select.d-none.mt-2.mb-2(multiple=true)
 
@@ -29,7 +29,8 @@ block content
           each opt of rngLst
             option(value=opt) #{opt} Hours
     .row
-      .col
+      .col.text-center
+        #nodata.h2.mt-4
 
   script.
     $( document ).ready( () => {
@@ -94,6 +95,8 @@ block content
       // ------------------------
       // XHR Data
       // ------------------------
+      var dh = dataHdlr()
+
       function get_tnd_data(action) {
 
         let url = `${url_srv}/tnd/xhr`;
@@ -112,10 +115,19 @@ block content
                     return
                   }
 
-                  console.log(data.time)
                   spinner(data.time)
+        
+                  if (data.timeSeries) {
+                    plotTnd(data)
+                  }
+                  else {
+                    let nodata_id = document.getElementById("nodata")
+                    nodata_id.innerHTML = "No Data"
+                    console.log(nodata_id)
+                  }
 
-                  plotTnd(data)              
+                  dh.process(data)
+
               },
               complete: function(){
                   clearTimeout(timeoutId)
