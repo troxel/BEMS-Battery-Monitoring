@@ -27,8 +27,9 @@ router.get('/xhr', async function(req, res, next) {
              select * from temperature order by time desc limit 1;
              select * from impedance order by time desc limit 1;
              select * from i_aux order by time desc limit 1;
-             select * from volts_aux order by time desc limit 1`;
-  
+             select * from volts_aux order by time desc limit 1;
+             select * from i_prop_str order by time desc limit 1;`;
+
   var rows
   try {
     rows = await db.querys(sql)
@@ -40,7 +41,7 @@ router.get('/xhr', async function(req, res, next) {
   let innerHTML = {}
   let style = {}
 
-  innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0], ...rows[3][0], ...rows[4][0]  }
+  innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0], ...rows[3][0], ...rows[4][0], ...rows[5][0]  }
 
   // Get max/min for strings
   vObj  =  rows[0][0]
@@ -59,8 +60,8 @@ router.get('/xhr', async function(req, res, next) {
       if ( val < lo.val ) { lo.val = val; lo.key = vKeys[j] }
     } 
 
-    hiloObj['vStr' + i + 'Min'] = lo.val 
-    hiloObj['vStr' + i + 'Max'] = hi.val 
+    hiloObj['vStr' + i + 'Min'] = lo.val.toFixed(1)
+    hiloObj['vStr' + i + 'Max'] = hi.val.toFixed(1) 
   
     attObj['vStr' + i + 'Min'] = {title:lo.key} 
     attObj['vStr' + i + 'Max'] = {title:hi.key}
@@ -82,8 +83,8 @@ router.get('/xhr', async function(req, res, next) {
     if ( val < lo.val ) { lo.val = val; lo.key = key }
   }
 
-  hiloObj['vaMin'] = lo.val 
-  hiloObj['vaMax'] = hi.val 
+  hiloObj['vaMin'] = lo.val.toFixed(1) 
+  hiloObj['vaMax'] = hi.val.toFixed(1) 
 
   attObj['vaMin'] = {title:lo.key} 
   attObj['vaMax'] = {title:hi.key}
@@ -104,6 +105,13 @@ router.get('/xhr', async function(req, res, next) {
   delete rows[4][0].time
   innerHTML['vaSum'] = _.sum(Object.values(rows[4][0])).toFixed(0)
 
+  // Format ---------------------------------
+  innerHTML.i_aux = innerHTML.i_aux.toFixed(1)
+  innerHTML.i_str0 = innerHTML.i_str0.toFixed(1)
+  innerHTML.i_str1 = innerHTML.i_str1.toFixed(1)
+  innerHTML.i_str2 = innerHTML.i_str2.toFixed(1)
+  innerHTML.i_str3 = innerHTML.i_str3.toFixed(1)
+  
   // Populate and color max/min tables
   let spHighVolt = req.cookies.spHighVolt
   let spLowVolt  = req.cookies.spLowVolt
@@ -132,13 +140,6 @@ router.get('/xhr', async function(req, res, next) {
   sql = `select * from flt_buffer`;
   fltAlm = await db.querys(sql)
   
-  // -----------------------------------
-  sql = `select * from i_prop_str order by time desc limit 1`;
-  
-  let iPropRows = await db.querys(sql)
-
-  for (const k in iPropRows[0]) innerHTML[k] = iPropRows[0][k] 
-
   // Prepare to return
   rtnObj['innerHTML'] = innerHTML
   rtnObj['fltAlm'] = fltAlm
@@ -150,20 +151,4 @@ router.get('/xhr', async function(req, res, next) {
   res.json(rtnObj) 
 })
 
-// handy dandy array sum function
-// Using lodash now.
-//Array.prototype.sum = function() {
-//   return this.reduce(function(a,b){return a+b;});
-//};
-
-
 module.exports = router;
-
-
-
-
-
-
-
-
-
