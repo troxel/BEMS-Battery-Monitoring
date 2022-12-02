@@ -6,6 +6,7 @@ const config = require('../config');
 const util = require('../services/cmn-util')
 
 const _ = require('lodash');
+const { max } = require('lodash');
 
 var date = new Date();
 
@@ -41,15 +42,58 @@ router.get('/xhr', async function(req, res, next) {
 
   innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0], ...rows[3][0], ...rows[4][0]  }
 
+  // Get max/min for strings
+  vObj  =  rows[0][0]
+  vKeys =  Object.keys(vObj)
+  vKeys.shift() // time
+    
+  hiloObj = {}, hi = {}, lo = {}, attObj = {}
+  for ( i = 0; i < 4; i++ ) {
+    hi.val = -1
+    lo.val = 20 
+    for ( j = 70*i; j< 70*(i+1); j++ ) {
+      val = vObj[ vKeys[j] ]
+      if ( val == null ) { continue }
+
+      if ( val > hi.val ) { hi.val = val; hi.key = vKeys[j] }      
+      if ( val < lo.val ) { lo.val = val; lo.key = vKeys[j] }
+    } 
+
+    hiloObj['vStr' + i + 'Min'] = lo.val 
+    hiloObj['vStr' + i + 'Max'] = hi.val 
+  
+    attObj['vStr' + i + 'Min'] = {title:lo.key} 
+    attObj['vStr' + i + 'Max'] = {title:hi.key}
+  }
+  
+  innerHTML.hilo = hiloObj
+
+  // Get max/min for aux cells
+  vaObj =  rows[4][0]
+  delete vaObj['time']
+
+  hi = {}, lo = {}
+  hi.val = -1, lo.val = 20 
+  for ( [key, val] of Object.entries(vaObj)) {
+
+    if ( val == null ) { continue }
+
+    if ( val > hi.val ) { hi.val = val; hi.key = key }      
+    if ( val < lo.val ) { lo.val = val; lo.key = key }
+  }
+
+  hiloObj['vaMin'] = lo.val 
+  hiloObj['vaMax'] = hi.val 
+
+  attObj['vaMin'] = {title:lo.key} 
+  attObj['vaMax'] = {title:hi.key}
 
   let rtnObj = {}
   rtnObj['time'] = rows[0][0]['time']  // spinner
  
   delete rows[0][0]['time']
 
-  let vKeys = Object.keys(rows[0][0])
-  let vVals = Object.values(rows[0][0])
-  let vHash = rows[0][0]
+  vVals = Object.values(rows[0][0])
   
   // Calculate string series voltage
   for (let i=0;i<4;i++){
@@ -77,18 +121,6 @@ router.get('/xhr', async function(req, res, next) {
   innerHTML['tempinner'] = a
   style['tempColor'] = b
 
-//console.log(a,b)
-
-  // tKeys = Object.keys(rows[1][0])
-  // tVals = Object.values(rows[1][0])
-  // tHash = rows[1][0]
-  // delete tHash['time']
-
-  // // Note tAve is not used in the template... 
-  // innerHTML['tAve'] = (_.sum(tVals)/tVals.length).toFixed(1)
-
-  // innerHTML['tminmax'] = util.maxmin(vHash,'t')
-
   // Faults and Alarms ....
   if ( req.query.clearFaults ){
     sql = 'delete from flt_buffer'
@@ -111,6 +143,7 @@ router.get('/xhr', async function(req, res, next) {
   rtnObj['innerHTML'] = innerHTML
   rtnObj['fltAlm'] = fltAlm
   rtnObj['style'] = style
+  rtnObj['setAttribute'] = attObj
  
   rtnObj.innerHTML.fltBang = req.hdr.fltNum ? '!' : ''
 

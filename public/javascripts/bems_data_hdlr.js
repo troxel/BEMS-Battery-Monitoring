@@ -535,15 +535,13 @@ function dataHdlr(hdlrObj) {
    this.setAttribute = function(data) {
        for (let id in data) {
 
-         if (typeof(data[id]) === 'object' ) {
-            this.setAttribute(data[id])
-         }
+         // Recursive doesn't work for setAttribute! 
+         // Value is an object
 
          const elid = document.getElementById(id)
          if ( elid != null ) {
             for (let attr in data[id]) {
                let rtn = elid.setAttribute(attr,data[id][attr])
-               console.log(rtn,id,elid,attr,data[id][attr])
             }
          }
       }
