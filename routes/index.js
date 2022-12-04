@@ -22,6 +22,10 @@ router.get('/', function(req, res, next) {
 // -----------------------------------------------------------
 router.get('/xhr', async function(req, res, next) {
 
+  // Note the syntax .? is object chaining which prevents an error 
+  // being thrown for the real condition of null.toFixed(2)
+  // https://matrixread.com/optional-chaining-question-mark-and-dot-javascript/
+
   // volts,temperature,impedance,i_aux,volts_aux
   let sql = `select * from volts order by time desc limit 1;
              select * from temperature order by time desc limit 1;
@@ -60,8 +64,8 @@ router.get('/xhr', async function(req, res, next) {
       if ( val < lo.val ) { lo.val = val; lo.key = vKeys[j] }
     } 
 
-    hiloObj['vStr' + i + 'Min'] = lo.val.toFixed(1)
-    hiloObj['vStr' + i + 'Max'] = hi.val.toFixed(1) 
+    hiloObj['vStr' + i + 'Min'] = lo.val?.toFixed(1)
+    hiloObj['vStr' + i + 'Max'] = hi.val?.toFixed(1) 
   
     attObj['vStr' + i + 'Min'] = {title:lo.key} 
     attObj['vStr' + i + 'Max'] = {title:hi.key}
@@ -83,8 +87,8 @@ router.get('/xhr', async function(req, res, next) {
     if ( val < lo.val ) { lo.val = val; lo.key = key }
   }
 
-  hiloObj['vaMin'] = lo.val.toFixed(1) 
-  hiloObj['vaMax'] = hi.val.toFixed(1) 
+  hiloObj['vaMin'] = lo.val?.toFixed(1) 
+  hiloObj['vaMax'] = hi.val?.toFixed(1) 
 
   attObj['vaMin'] = {title:lo.key} 
   attObj['vaMax'] = {title:hi.key}
@@ -98,19 +102,19 @@ router.get('/xhr', async function(req, res, next) {
   
   // Calculate string series voltage
   for (let i=0;i<4;i++){
-    innerHTML['vSumStr'+i] = _.sum(vVals.splice(0,70)).toFixed(0)
+    innerHTML['vSumStr'+i] = _.sum(vVals.splice(0,70))?.toFixed(0)
   }
 
   // Calculate aux voltage
   delete rows[4][0].time
-  innerHTML['vaSum'] = _.sum(Object.values(rows[4][0])).toFixed(0)
+  innerHTML['vaSum'] = _.sum(Object.values(rows[4][0]))?.toFixed(0)
 
   // Format ---------------------------------
-  innerHTML.i_aux = innerHTML.i_aux.toFixed(1)
-  innerHTML.i_str0 = innerHTML.i_str0.toFixed(1)
-  innerHTML.i_str1 = innerHTML.i_str1.toFixed(1)
-  innerHTML.i_str2 = innerHTML.i_str2.toFixed(1)
-  innerHTML.i_str3 = innerHTML.i_str3.toFixed(1)
+  innerHTML.i_aux = innerHTML.i_aux?.toFixed(1)
+  innerHTML.i_str0 = innerHTML.i_str0?.toFixed(1)
+  innerHTML.i_str1 = innerHTML.i_str1?.toFixed(1)
+  innerHTML.i_str2 = innerHTML.i_str2?.toFixed(1)
+  innerHTML.i_str3 = innerHTML.i_str3?.toFixed(1)
   
   // Populate and color max/min tables
   let spHighVolt = req.cookies.spHighVolt

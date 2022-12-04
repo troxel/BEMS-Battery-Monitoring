@@ -116,12 +116,13 @@ block content
                   }
 
                   spinner(data.time)
-        
-                  if (data.timeSeries) {
+
+                  let nodata_id = document.getElementById("nodata")
+                  if (data.timeSeries || data.dr) {
+                    nodata_id.innerHTML = ""
                     plotTnd(data)
                   }
                   else {
-                    let nodata_id = document.getElementById("nodata")
                     nodata_id.innerHTML = "No Data"
                     console.log(nodata_id)
                   }
@@ -164,6 +165,8 @@ block content
         else {
           
           for (const [sen, dataSen] of Object.entries(data.sensors)) {
+
+            //data.timeSeries = data.timeSeries.map((d)=>{return Date(d)})
 
             traceLst.push( {
               x: data.timeSeries,
