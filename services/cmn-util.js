@@ -1,42 +1,27 @@
 const _ = require('lodash');
 
-// ------------------------------------
-// Takes a hash (object) such as {a1=3,a5=2,a2=4...}
-// and returns a object with max and min keys/values
-// rtnHsh = { prefixMaxKey0:maxval0,prefixMax2,maxval1... prefix}
+// Overriding the toJSON prototype as it converts the Date object to 
+// zulu time which plotly doesn't know how to deal with properly.
+// This prototype converts the Date Object to ISO with timezone offset
+// which new Date knows how to handle correctly. 
+// https://stackoverflow.com/questions/31096130/how-to-json-stringify-a-javascript-date-and-preserve-timezone
+Date.prototype.toJSON = function () {
+  var timezoneOffsetInHours = -(this.getTimezoneOffset() / 60); //UTC minus local time
+  var sign = timezoneOffsetInHours >= 0 ? '+' : '-';
+  var leadingZero = (Math.abs(timezoneOffsetInHours) < 10) ? '0' : '';
 
-function maxmin(hsh,prefix,len=10){
-
-  delete hsh['time']
-  let keys = Object.keys(hsh)
-
-  keysNoNull = _.remove(keys, (n) => { return(hsh[n] != null ? true : false) })
-
-  keysNoNull.sort((a,b)=>{return hsh[a]-hsh[b]})
-
-  //console.log(keysNoNull)
-  //console.log(keys)
+  //It's a bit unfortunate that we need to construct a new Date instance 
+  //(we don't want _this_ Date instance to be modified)
+  var correctedDate = new Date(this.getFullYear(), this.getMonth(), 
+      this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), 
+      this.getMilliseconds());
+  correctedDate.setHours(this.getHours() + timezoneOffsetInHours);
+  var iso = correctedDate.toISOString().replace('Z', '');
   
-  // pull out numbers from object keys
-  const reTray = /(\d+)$/
+  rtn_str = iso + sign + leadingZero + Math.abs(timezoneOffsetInHours).toString() + ':00'
+  console.log(rtn_str)
 
-  const rtnHsh = {}
-  let endLst =  keysNoNull.length - 1
-  for ( let i = 0; i<len; i++ ) {
-
-    let id = reTray.exec(keysNoNull[i])[0]
-
-    rtnHsh[prefix + "MinKey" + i] = id
-    rtnHsh[prefix + "MinVal" + i] = hsh[keysNoNull[i]]
-
-    let offset = endLst - i; 
-    id = reTray.exec(keysNoNull[offset])[0]
-
-    rtnHsh[prefix + "MaxKey" + i] = id
-    rtnHsh[prefix + "MaxVal" + i] = hsh[keysNoNull[offset]]
-  }
-
-  return(rtnHsh)
+  return rtn_str
 }
 
 // ---------------------------------------
@@ -134,11 +119,12 @@ function tblProc(prefx,hsh,spHigh,spLow) {
   return([innerHTML, style])
 }
 
-
+// ---------------------------------------
+// bit util
 // ---------------------------------------
 let bit = []  
 for(i=0;i<24;i++) { bit[i]=2**i }
 
 module.exports = {
-  maxmin, bit, tblProc
+  bit, tblProc
 }

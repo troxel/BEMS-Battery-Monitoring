@@ -10,37 +10,6 @@ const { xor } = require('lodash');
 
 const dr = require('datareduce')
 
-// Only override that works ugli
-// https://stackoverflow.com/questions/31096130/how-to-json-stringify-a-javascript-date-and-preserve-timezone
-Date.prototype.toJSON = function () {
-  var timezoneOffsetInHours = -(this.getTimezoneOffset() / 60); //UTC minus local time
-  
-  var sign = timezoneOffsetInHours >= 0 ? '+' : '-';
-  var leadingZero = (Math.abs(timezoneOffsetInHours) < 10) ? '0' : '';
-  
-  //It's a bit unfortunate that we need to construct a new Date instance 
-  //(we don't want _this_ Date instance to be modified)
-  var correctedDate = new Date(this.getFullYear(), this.getMonth(), 
-  this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), 
-  this.getMilliseconds());
-  
-  correctedDate.setHours(this.getHours() + timezoneOffsetInHours);
-  
-  var iso = correctedDate.toISOString();
-  
-  //var iso = correctedDate.toISOString().replace('Z', '');
-    //fullMonty = (iso + sign + leadingZero + Math.abs(timezoneOffsetInHours).toString() + ':00')
-
-  return iso;
-}
-//Date.prototype.toJSON = function() { return this.toISOString() }; 
-//  console.log(date,typeof date)
- //t = date.toLocaleString('en-US', { timeZone: 'PST'}); 
- // console.log(date,t)
- // return t
-//}
-//Date.prototype.toJSON = function(){ return '2022-12-04T05:01:24.000Z' }
-
 // Data decimation stuff
 const {largestTriangleThreeBucket} = require('d3fc-sample')
 lttb = largestTriangleThreeBucket()
@@ -92,8 +61,6 @@ router.get('/xhr', async function(req, res, next) {
   // [ { time: 2022-11-05T05:26:07.000Z, v1: 12.2 },
   //   { time: 2022-11-05T05:25:49.000Z, v1: 12.9 }, ... ]
   
-  rows
-
   if ( ! rows.length ) {
     console.log("Error No Data")
     console.log(tbl,sensors,rng)
@@ -129,7 +96,12 @@ router.get('/xhr', async function(req, res, next) {
     delete rtnData.timeSeries
   }  
 
+  // Note: the Date toJSON prototype is overridden in cmn-utils.js
+  // So that plotly works correctly.  A bug in plotly. If plotly 
+  // ever fixes this bug remove the override as it is slow by comparison 
+
   res.json(rtnData) 
+ 
 })
  
 module.exports = router;
