@@ -10,6 +10,8 @@ const { max } = require('lodash');
 
 var date = new Date();
 
+const ping = require('ping');
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   
@@ -64,8 +66,8 @@ router.get('/xhr', async function(req, res, next) {
       if ( val < lo.val ) { lo.val = val; lo.key = vKeys[j] }
     } 
 
-    hiloObj['vStr' + i + 'Min'] = lo.val?.toFixed(1)
-    hiloObj['vStr' + i + 'Max'] = hi.val?.toFixed(1) 
+    hiloObj['vStr' + i + 'Min'] = lo.val?.toFixed(2)
+    hiloObj['vStr' + i + 'Max'] = hi.val?.toFixed(2) 
   
     attObj['vStr' + i + 'Min'] = {title:lo.key} 
     attObj['vStr' + i + 'Max'] = {title:hi.key}
@@ -128,6 +130,17 @@ router.get('/xhr', async function(req, res, next) {
   //var [a,b] = util.tblProc('b',rows[1][0],spHighBalance,0)
   //rtnObj['style']['BalanceColor'] = b
 
+  // ---- Webmanager status ----- 
+  for (const wm of [ 'WM1A','WM1B','WM2A','WM2B','WM3A','WM3B','WM4A','WM4B'] ) {
+    // ping.sys.probe(wm, function(response){
+    //   innerHTML[wm] = response.alive ? '▲' : '▼'
+    //   style[wm] = response.alive ? {backgroundColor:'lightgreen'} : {backgroundColor:'red'}
+    // });
+    let response = await ping.promise.probe(wm)
+    innerHTML[wm] = response.alive ? '▲' : '▼'
+    style[wm] = response.alive ? {backgroundColor:'lightgreen'} : {backgroundColor:'red'}
+  }
+  
   // Temperature stats
   var [a,b] = util.tblProc('t',rows[1][0],spHighTemp,0)
   innerHTML['tempinner'] = a

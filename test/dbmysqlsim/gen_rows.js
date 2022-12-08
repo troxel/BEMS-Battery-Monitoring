@@ -39,7 +39,7 @@ var con = mysql.createConnection({
   host: "127.0.0.1",
   user: "webdev",
   password: "webdev1!",
-  database: "bems"
+  database: "bems_v1.1"
 
 });
 

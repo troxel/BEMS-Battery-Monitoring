@@ -35,12 +35,24 @@ block content
   script.
     $( document ).ready( () => {
 
+      function snsrSelectors(prefx) {
+        let lst = []
+        for( i=0;i<280;i++) {
+          strLbl = Math.floor(i/70) + 1
+          trayLbl = i%70 + 1
+          if (trayLbl < 10) trayLbl = "0"+trayLbl
+          lst[i] = `${prefx}Tray${strLbl}_${trayLbl}`
+        }
+        return lst
+      } 
+
       // Column names in tables - some inconsistancy attempt to fix later
       var tblFlds = {}
-      tblFlds.volts       = [...Array(280).keys()].map( i => 'v' + (i+1) )
-      tblFlds.temperature = [...Array(280).keys()].map( i => 't' + (i+1) )
-      tblFlds.balance     = [...Array(280).keys()].map( i => 'b' + (i+1) )
-      tblFlds.impedance   = [...Array(280).keys()].map( i => 'r' + (i+1) )
+      tblFlds.volts       = snsrSelectors('v')
+      tblFlds.temperature = snsrSelectors('t')
+      tblFlds.balance     = snsrSelectors('b')
+      tblFlds.impedance   = snsrSelectors('r')
+
       tblFlds.i_prop_str  = [...Array(4).keys()].map( i => 'i_str' + (i) )  // zero based :(
       tblFlds.volts_aux   = [...Array(280).keys()].map( i => 'va' + (i+1) )  
       tblFlds.temperature_aux  = ['aux_cell_temp_1','aux_cell_temp_2','aux_cell_temp_3','aux_cell_temp_4','aux_amb_temp_1','aux_amb_temp_2']

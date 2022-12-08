@@ -1,6 +1,27 @@
 extends layout
 
+mixin snsr_tbl(title,snsrLst)
+  - len = snsrLst.length
+  table.table-bordered.caption-top.traytbl
+    caption=title
+    - row_lim = 7
+    - col_lim = 10
+    - row_cnt = 0
+    while (row_cnt < row_lim)
+      tr
+        - col_cnt = 0
+        while ( col_cnt < col_lim)
+          - idx = row_cnt*col_lim + col_cnt
+          td.cfs(id=snsrLst[idx] title=snsrLst[idx]) &nbsp;
+          - col_cnt++
+      -row_cnt++   
+
 block content
+  // List used in mixin 
+  - voltsLst = volts.split(',')
+  - tempLst = temperature.split(',')
+  - balanceLst = balance.split(',')
+  - impedanceLst = impedance.split(',')
 
   input#str_id(type="hidden",value=str_id)
   .container
@@ -50,25 +71,8 @@ block content
             td
 
       .col-7
-        table.table-bordered.caption-top.traytbl
-          caption Tray Voltages
-          - var offset_cell = str_id * 70 + 1 
-          - var rows = 7
-          - var cols = 10
-          - var row_cnt = 0
-          - var inx_cnt = 1
-          - var str_num = str_id + 1
-          - var ttl_str = "tray"+str_num+"-"
-          while (row_cnt < rows)
-            tr
-              - var col_cnt = 0
-              while (col_cnt < cols)
-                - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="v" +cell_cnt, title=ttl_str+inx_cnt) &nbsp;
-                - col_cnt++
-                - inx_cnt++
-              - offset_cell = offset_cell + cols
-              - row_cnt++
+        +snsr_tbl('Tray Voltage',voltsLst)
+
         include includes/spVolts.pug
     .row.border.border-primary.strrow.mt-3.ms-1.shadow()
       .col-3
@@ -90,25 +94,7 @@ block content
             td
       .col-2
       .col-4
-        table.table-bordered.caption-top.traytbl(style="width:400px")
-          caption Tray Temperatures °F
-          - var offset_cell = str_id * 70 + 1 
-          - var rows = 7
-          - var cols = 10
-          - var row_cnt = 0
-          - var inx_cnt = 1
-          - var str_num = str_id + 1
-          - var ttl_str = "tray"+str_num+"-"
-          while (row_cnt < rows)
-            tr
-              - var col_cnt = 0
-              while (col_cnt < cols)
-                - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="t" +cell_cnt, title=ttl_str+inx_cnt) &nbsp;
-                - col_cnt++
-                - inx_cnt++
-              - offset_cell = offset_cell + cols
-              - row_cnt++
+        +snsr_tbl('Tray Temps',tempLst)
         include includes/spTemp.pug
     .row.border.border-primary.strrow.mt-3.ms-1.shadow()
       .col-3
@@ -129,25 +115,7 @@ block content
             td
       .col-2
       .col-4
-        table.table-bordered.caption-top.traytbl(style="width:400px")
-          caption Tray Balance Percent
-          - var offset_cell = str_id * 70 + 1 
-          - var rows = 7
-          - var cols = 10
-          - var row_cnt = 0
-          - var inx_cnt = 1
-          - var str_num = str_id + 1
-          - var ttl_str = "tray"+str_num+"-"
-          while (row_cnt < rows)
-            tr
-              - var col_cnt = 0
-              while (col_cnt < cols)
-                - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="b" +cell_cnt, title=ttl_str+inx_cnt) &nbsp;
-                - col_cnt++
-                - inx_cnt++
-              - offset_cell = offset_cell + cols
-              - row_cnt++
+        +snsr_tbl('Tray Balance',balanceLst)
         include includes/spBalance.pug
     .row.border.border-primary.strrow.my-3.ms-1.shadow()
       .col-3
@@ -168,25 +136,7 @@ block content
           
       .col-2
       .col-4
-        table.table-bordered.caption-top.traytbl(style="width:400px")
-          caption Tray Impedance mOhm
-          - var offset_cell = str_id * 70 + 1 
-          - var rows = 7
-          - var cols = 10
-          - var row_cnt = 0
-          - var inx_cnt = 1
-          - var str_num = str_id + 1
-          - var ttl_str = "tray"+str_num+"-"
-          while (row_cnt < rows)
-            tr
-              - var col_cnt = 0
-              while (col_cnt < cols)
-                - cell_cnt = offset_cell + col_cnt
-                td.cfs(id="r" +cell_cnt, title=ttl_str+inx_cnt) &nbsp;
-                - col_cnt++
-                - inx_cnt++
-              - offset_cell = offset_cell + cols
-              - row_cnt++
+        +snsr_tbl('Tray Impedance',impedanceLst)
         include includes/spImpedance.pug
 
   script.

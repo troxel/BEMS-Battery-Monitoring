@@ -5,8 +5,13 @@ var pHsh = {v:'volts',t:'temperature',b:'balance',r:'impedance'}
 for(j of pLst) {
       let tLst = []
 
-      for (var i = 1; i <= 280; i++) {
-            tLst.push(`${j}${i} float`)
+      for (var i = 0; i < 280; i++) {
+            strLbl = Math.floor(i/70) + 1
+            trayLbl = i%70 + 1
+
+            if (trayLbl < 10) trayLbl = "0"+trayLbl
+
+            tLst.push(`${j}Tray${strLbl}_${trayLbl} float`)
       }
      
       var str = `CREATE TABLE ${pHsh[j]} ( time timestamp not null default current_timestamp primary key,`

@@ -3,7 +3,7 @@ const _ = require('lodash');
 // Overriding the toJSON prototype as it converts the Date object to 
 // zulu time which plotly doesn't know how to deal with properly.
 // This prototype converts the Date Object to ISO with timezone offset
-// which new Date knows how to handle correctly. 
+// which "new Date" handle correctlys and so does plotly. 
 // https://stackoverflow.com/questions/31096130/how-to-json-stringify-a-javascript-date-and-preserve-timezone
 Date.prototype.toJSON = function () {
   var timezoneOffsetInHours = -(this.getTimezoneOffset() / 60); //UTC minus local time
@@ -19,7 +19,7 @@ Date.prototype.toJSON = function () {
   var iso = correctedDate.toISOString().replace('Z', '');
   
   rtn_str = iso + sign + leadingZero + Math.abs(timezoneOffsetInHours).toString() + ':00'
-  console.log(rtn_str)
+  //console.log(rtn_str)
 
   return rtn_str
 }
@@ -85,35 +85,24 @@ function tblProc(prefx,hsh,spHigh,spLow) {
 
   let endInx =  keysNoNull.length - 1
   for ( let i = 0; i<lenRow; i++ ) {
-    let ident = keysNoNull[i]            // ie v1,v2, etc.
+    let cell = keysNoNull[i]            // ie v1,v2, etc.
     
-    if (! ident) continue; 
-
-    let cell = reTray.exec(ident)[0]
-
-    // tray for prop / cell for aux   
-    let subcell = cell % 70
-
-    // create tray identifier and format
-    subcell = (subcell>10) ? subcell : '0' + subcell
-    let tray = 'tray' + (Math.trunc(cell / 70) + 1) + '-' + subcell
+    if (! cell) continue; 
+    let tray = cell.substring(1)
 
     innerHTML[prefx + "MinTray" + i] = tray
     innerHTML[prefx + "MinKey" + i] = cell
-    innerHTML[prefx + "MinVal" + i] = hsh[ident].toFixed(2)
-    style[prefx + "MinRow" + i] = style[ident]   
+    innerHTML[prefx + "MinVal" + i] = hsh[cell].toFixed(2)
+    style[prefx + "MinRow" + i] = style[cell]   
 
     let offset = endInx - i; 
-    cell = reTray.exec(keysNoNull[offset])[0]
-
-    subcell = cell % 70
-    subcell = (subcell>10) ? subcell : "0" + subcell
-    tray = 'tray' + (Math.trunc(cell / 70) + 1) + '-' + subcell
+    cell = keysNoNull[offset]
+    tray = cell.substring(1);
 
     innerHTML[prefx + "MaxTray" + i] = tray
     innerHTML[prefx + "MaxKey" + i] = cell
-    innerHTML[prefx + "MaxVal" + i] = hsh[keysNoNull[offset]].toFixed(2)
-    style[prefx + "MaxRow" + i] = style[keysNoNull[offset]]   
+    innerHTML[prefx + "MaxVal" + i] = hsh[cell].toFixed(2)
+    style[prefx + "MaxRow" + i] = style[cell]   
   }
 
   return([innerHTML, style])

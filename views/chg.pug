@@ -1,5 +1,28 @@
 extends layout
 
+mixin chrg_tbl(prefx,caption)
+  span.lead.font-weight-bold #{caption}
+  - var tbl_cnt = 0
+  while (tbl_cnt < chgrs)
+    - var row_cnt = 0
+    table.chg-tbl
+      while (row_cnt < rows)
+        tr
+          - var col_cnt = 0
+          - var col_start = row_cnt * innerLoopStep + tbl_cnt * outerLoopStep
+          while (col_cnt < cols)
+            - cell_id = col_start + col_cnt
+
+            - subcell_id = cell_id % 70 + 1
+            - subcell_id = (subcell_id>=10) ? subcell_id : "0" + subcell_id
+            - tray_id = (Math.trunc(cell_id / 70) + 1)
+            - id = prefx + 'Tray' + tray_id + '_' + subcell_id
+
+            td(id=id, title=id) &nbsp;
+            - col_cnt++
+          - row_cnt++
+    - tbl_cnt++
+
 block content
 
   .container
@@ -13,7 +36,6 @@ block content
       - var rows = 4
       - var cols = 10
       - var chgrs = 7
-      - var tblContent = [{prefix:'v',caption:'Voltage',include:'sbVolts.pug'},{prefix:'b',caption:'Balance',include:'sbVolts.pug'}]
       - var chgNum = [1,2,3,4,5,6,7]
       .col-1.gx-2
         span.lead.font-weight-bold Charger
@@ -28,31 +50,11 @@ block content
               td.text-end(id="Chg"+num+"Str3") #{num}
             tr
               td.text-end(id="Chg"+num+"Str4") #{num}
-      each item in tblContent
-        .col.gx-2
-            - var cap = item['caption']
-            - var prefix = item['prefix']
-            span.lead.font-weight-bold #{cap}
-            - var tbl_cnt = 0
-            while (tbl_cnt < chgrs)
-              - var row_cnt = 0
-              table.chg-tbl
-                while (row_cnt < rows)
-                  tr
-                    - var col_cnt = 0
-                    - var col_start = row_cnt * innerLoopStep + tbl_cnt * outerLoopStep
-                    while (col_cnt < cols)
-                      - cell_id = col_start + col_cnt + 1
+      .col.gx-2
+        +chrg_tbl('v','Voltage')
+      .col.gx-2
+        +chrg_tbl('b','Balance')
 
-                      - subcell_id = cell_id % 70
-                      - subcell_id = (subcell_id>10) ? subcell_id : "0" + subcell_id
-                      - tray_id = (Math.trunc(cell_id / 70) + 1)
-                      - ttl = 'tray' + tray_id + '-' + subcell_id
-
-                      td(id=prefix + cell_id, title=ttl) #{prefix}#{cell_id}
-                      - col_cnt++
-                    - row_cnt++
-              - tbl_cnt++
   .container
     .row.border.border-primary.strrow.mb-4.ms-1.mt-1
       .col-7
