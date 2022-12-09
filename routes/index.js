@@ -24,6 +24,20 @@ router.get('/', function(req, res, next) {
 // -----------------------------------------------------------
 router.get('/xhr', async function(req, res, next) {
 
+  // Return object
+  let innerHTML = {}
+  let style = {}
+
+  // ---- Webmanager status ----- 
+  pingPromise = []
+  hosts = [ 'WM1A','WM1B','WM2A','WM2B','WM3A','WM3B','WM4A','WM4B' ]
+  for (const i in hosts ) {
+    pingPromise[i] = ping.promise.probe(hosts[i],{timeout:1});
+    // let response = await ping.promise.probe(wm)
+    // innerHTML[wm] = response.alive ? '▲' : '▼'
+    // style[wm] = response.alive ? {backgroundColor:'lightgreen'} : {backgroundColor:'red'}
+  }
+
   // Note the syntax .? is object chaining which prevents an error 
   // being thrown for the real condition of null.toFixed(2)
   // https://matrixread.com/optional-chaining-question-mark-and-dot-javascript/
@@ -42,10 +56,6 @@ router.get('/xhr', async function(req, res, next) {
   } catch(err) {
     console.error("Error xhr: ",err)
   } 
-
-  // Return object
-  let innerHTML = {}
-  let style = {}
 
   innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0], ...rows[3][0], ...rows[4][0], ...rows[5][0]  }
 
@@ -130,17 +140,6 @@ router.get('/xhr', async function(req, res, next) {
   //var [a,b] = util.tblProc('b',rows[1][0],spHighBalance,0)
   //rtnObj['style']['BalanceColor'] = b
 
-  // ---- Webmanager status ----- 
-  for (const wm of [ 'WM1A','WM1B','WM2A','WM2B','WM3A','WM3B','WM4A','WM4B'] ) {
-    // ping.sys.probe(wm, function(response){
-    //   innerHTML[wm] = response.alive ? '▲' : '▼'
-    //   style[wm] = response.alive ? {backgroundColor:'lightgreen'} : {backgroundColor:'red'}
-    // });
-    let response = await ping.promise.probe(wm)
-    innerHTML[wm] = response.alive ? '▲' : '▼'
-    style[wm] = response.alive ? {backgroundColor:'lightgreen'} : {backgroundColor:'red'}
-  }
-  
   // Temperature stats
   var [a,b] = util.tblProc('t',rows[1][0],spHighTemp,0)
   innerHTML['tempinner'] = a
@@ -156,13 +155,19 @@ router.get('/xhr', async function(req, res, next) {
   // --- Alarms and Faults
   sql = `select * from flt_buffer`;
   fltAlm = await db.querys(sql)
-  
+
+  response = await Promise.all(pingPromise).catch ( ()=>{console.error('error in ping') })
+  for(const obj of response) {
+    innerHTML[obj.inputHost] = obj.alive ? '▲' : '▼'
+    style[obj.inputHost] = obj.alive ? {backgroundColor:'lightgreen'} : {backgroundColor:'red'}
+  }
+
   // Prepare to return
   rtnObj['innerHTML'] = innerHTML
   rtnObj['fltAlm'] = fltAlm
   rtnObj['style'] = style
   rtnObj['setAttribute'] = attObj
- 
+
   rtnObj.innerHTML.fltBang = req.hdr.fltNum ? '!' : ''
 
   res.json(rtnObj) 
