@@ -14,7 +14,7 @@ const ping = require('ping');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  
+ 
   res.render('index', { title: 'BEMS' });
 
 });
@@ -28,7 +28,7 @@ router.get('/xhr', async function(req, res, next) {
   let innerHTML = {}
   let style = {}
 
-  // ---- Webmanager status ----- 
+  // ---- Webmanager status -----
   pingPromise = []
   hosts = [ 'WM1A','WM1B','WM2A','WM2B','WM3A','WM3B','WM4A','WM4B' ]
   for (const i in hosts ) {
@@ -38,7 +38,7 @@ router.get('/xhr', async function(req, res, next) {
     // style[wm] = response.alive ? {backgroundColor:'lightgreen'} : {backgroundColor:'red'}
   }
 
-  // Note the syntax .? is object chaining which prevents an error 
+  // Note the syntax .? is object chaining which prevents an error
   // being thrown for the real condition of null.toFixed(2)
   // https://matrixread.com/optional-chaining-question-mark-and-dot-javascript/
 
@@ -55,7 +55,7 @@ router.get('/xhr', async function(req, res, next) {
     rows = await db.querys(sql)
   } catch(err) {
     console.error("Error xhr: ",err)
-  } 
+  }
 
   innerHTML = {...rows[0][0], ...rows[1][0], ...rows[2][0], ...rows[3][0], ...rows[4][0], ...rows[5][0]  }
 
@@ -63,7 +63,7 @@ router.get('/xhr', async function(req, res, next) {
   vObj  =  rows[0][0]
   vKeys =  Object.keys(vObj)
   vKeys.shift() // time
-    
+   
   hiloObj = {}, hi = {}, lo = {}, attObj = {}
   for ( i = 0; i < 4; i++ ) {
     hi.val = -1
@@ -74,15 +74,16 @@ router.get('/xhr', async function(req, res, next) {
 
       if ( val > hi.val ) { hi.val = val; hi.key = vKeys[j] }      
       if ( val < lo.val ) { lo.val = val; lo.key = vKeys[j] }
-    } 
+    }
+    if ( lo.val === 20) { lo.val = -1 }
 
     hiloObj['vStr' + i + 'Min'] = lo.val?.toFixed(2)
-    hiloObj['vStr' + i + 'Max'] = hi.val?.toFixed(2) 
-  
-    attObj['vStr' + i + 'Min'] = {title:lo.key} 
+    hiloObj['vStr' + i + 'Max'] = hi.val?.toFixed(2)
+ 
+    attObj['vStr' + i + 'Min'] = {title:lo.key}
     attObj['vStr' + i + 'Max'] = {title:hi.key}
   }
-  
+ 
   innerHTML.hilo = hiloObj
 
   // Get max/min for aux cells
@@ -98,11 +99,12 @@ router.get('/xhr', async function(req, res, next) {
     if ( val > hi.val ) { hi.val = val; hi.key = key }      
     if ( val < lo.val ) { lo.val = val; lo.key = key }
   }
+  if ( lo.val === 20) { lo.val = -1 }
 
-  hiloObj['vaMin'] = lo.val?.toFixed(1) 
-  hiloObj['vaMax'] = hi.val?.toFixed(1) 
+  hiloObj['vaMin'] = lo.val?.toFixed(1)
+  hiloObj['vaMax'] = hi.val?.toFixed(1)
 
-  attObj['vaMin'] = {title:lo.key} 
+  attObj['vaMin'] = {title:lo.key}
   attObj['vaMax'] = {title:hi.key}
 
   let rtnObj = {}
@@ -111,7 +113,7 @@ router.get('/xhr', async function(req, res, next) {
   delete rows[0][0]['time']
 
   vVals = Object.values(rows[0][0])
-  
+ 
   // Calculate string series voltage
   for (let i=0;i<4;i++){
     innerHTML['vSumStr'+i] = _.sum(vVals.splice(0,70))?.toFixed(0)
@@ -127,7 +129,7 @@ router.get('/xhr', async function(req, res, next) {
   innerHTML.i_str1 = innerHTML.i_str1?.toFixed(1)
   innerHTML.i_str2 = innerHTML.i_str2?.toFixed(1)
   innerHTML.i_str3 = innerHTML.i_str3?.toFixed(1)
-  
+ 
   // Populate and color max/min tables
   let spHighVolt = req.cookies.spHighVolt
   let spLowVolt  = req.cookies.spLowVolt
@@ -151,7 +153,7 @@ router.get('/xhr', async function(req, res, next) {
     let result = await db.querys(sql)
     console.log(result)
   }
-  
+ 
   // --- Alarms and Faults
   sql = `select * from flt_buffer`;
   fltAlm = await db.querys(sql)
@@ -170,7 +172,7 @@ router.get('/xhr', async function(req, res, next) {
 
   rtnObj.innerHTML.fltBang = req.hdr.fltNum ? '!' : ''
 
-  res.json(rtnObj) 
+  res.json(rtnObj)
 })
 
 module.exports = router;

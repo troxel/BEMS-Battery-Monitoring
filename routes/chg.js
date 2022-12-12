@@ -31,7 +31,7 @@ router.get('/xhr', async function(req, res, next) {
   
   // Need to convert nulls to empty string and fix float
   for ( [k,v] of Object.entries(innerHTML)){ 
-    if (v==null){innerHTML[k]=''}
+    if (v==null){innerHTML[k]='&nbsp;'}
     else { innerHTML[k]  = parseFloat(innerHTML[k]).toFixed(2) } 
   }
 
