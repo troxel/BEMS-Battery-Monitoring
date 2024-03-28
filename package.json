@@ -14,7 +14,7 @@
     "d3fc-sample": "^3.0.5",
     "datareduce": "^1.0.3",
     "debug": "~2.6.9",
-    "express": "^4.18.1",
+    "express": "^4.19.2",
     "express-session": "^1.17.3",
     "http-errors": "~1.6.3",
     "influx": "^5.9.3",
